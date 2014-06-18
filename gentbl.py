@@ -43,7 +43,11 @@ def process( line ):
             outString += " DC C'{{/if}}'\n"
             outString += " DC C'</div>'\n"
         elif '3c' in parms:
-            
+            outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n"
+            outString += " DC C'{{:" + fname + "_DATA}}'\n"
+            outString += " DC C' {{:" + parms[1] + "_data}}'\n"
+            outString += " DC C'</span>'\n"
+            outString += " DC C'</div>'\n"
         else:
             outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n"
             outString += " DC C'{{:" + fname + "_DATA}}</span>'\n"
@@ -73,10 +77,12 @@ for line in fileinput.input():
         f.write("*****\n")
         f.write(" DC C'</div>'\n")
         f.write(" DC C'<div class=\"group\">'\n")
-        multigroup = True
-        continue
-    thisLine = process(line)
-    f.write(thisLine)
+    elif "###EH" in line:
+        f.write(" DC C'<div class=\"empty-heading\">{{:" + fname +"_DATA}}</div>'\n")
+        f.write("*\n"
+    else:
+        thisLine = process(line)
+        f.write(thisLine)
 f.write(" DC C'</div>'\n")
 f.write("**********\n")
 f.write(" DC C'</div>'                            <!-- END OF FIXED -->\n")
