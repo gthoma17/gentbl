@@ -6,6 +6,8 @@
 ##    cl = conditional link, sometimes link, sometimes not
 ##    ic = inline conditional, first parm is left text, second two are conditional for right field
 ##seperate multiple parameters with commas
+##
+##    
 
 def link( fname ):
     outString = ""
