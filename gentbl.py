@@ -1,3 +1,10 @@
+#COPYRIGHT COMPUWARE CORPORATION
+#INTERNAL USE ONLY
+#YOU ARE NOT ALLOWED TO USE THIS SCRIPT OR COPY OR DISTRIBUTE OR MODIFIY THIS SCRIPT IF YOU DON'T WORK FOR COMPUWARE
+#I would release this under an open source (apache) lisence but compuware owns all the code I write that is 
+#directly related to work (also my soul)
+#currently merely writes all fnames out to a file
+
 ##line parms:
 ##    c  = conditional
 ##    h  = heading

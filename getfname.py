@@ -10,6 +10,7 @@
 #       if FNAME && b4 close parens && I have nested IF && that nested if is an ATTR{TAB} --> ,cl (MQOPTGET) - conditionally sometimes a link sometimes not
 #       if Attr(TABS) --> ,l (links)
 #       ALL ELSE --> just a newline (normal collumns inside of a group)
+#       FNAME && no DLOC{} && if/else block following --> ,ic (inline conditional, for exapmple (MQOPTGET) - yes or no with an FDESC whether or not the case is true
 
 #this leaves fixed pro (ie. USING BLAH BLAH in MQLOPEN), 3 collumn rows (Decimal line in MQLGET)  
 
