@@ -22,14 +22,18 @@ f = open("OUT." + sys.argv[1],"w+")
 
 for line in fileinput.input():
     lineList = line.split();
-    print lineList
+    #print lineList
     if(len(lineList) != 0):
         for word in lineList:
-            print word
             #does my word = FNAME{blahbla}
             if(word[0] == 'F' and word[1] == 'N' and word[2] == 'A' and word[3] == 'M' and word[4] == 'E'):
                 for char in range(6,(len(word)-1)):
                     #sys.stdout.write(word[char])
                     f.write(word[char])
                 #print
+                # if the line contaning the FNAME also has the text HDR{YES}, then you've got a header
+                for word2 in lineList:
+                    if (word2 == 'HDR{YES}'):
+                        f.write(",h")
                 f.write("\n");
+
