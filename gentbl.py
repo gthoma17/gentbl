@@ -1,13 +1,16 @@
 ##line parms:
-##    c = conditional
-##    h = heading
-##    l = link
+##    c  = conditional
+##    h  = heading
+##    l  = link
 ##    3c = 3 col format. second parm is the fname of date used in col 3
 ##    cl = conditional link, sometimes link, sometimes not
 ##    ic = inline conditional, first parm is left text, second two are conditional for right field
 ##seperate multiple parameters with commas
 ##
-##    
+##line directives:
+##    ###NEWGROUP = creates a new group, no parms needed
+##    ###EMPTHEAD = creates new empty header, no parms needed
+##    ###FIXEDPRO = creates new fixed pro field, fname after comma indicates where data comes from
 
 def link( fname ):
     outString = ""
@@ -97,11 +100,13 @@ f.write(" DC C'<div id=\"fixedArea\">'\n")
 f.write("**********\n")
 f.write(" DC C'<div id=\"group\">'\n")
 for line in fileinput.input():
+    if "###FIXEDPRO" in line:
+        f.write("DC C'<div class="fixedPro">{{:" + fname +"_DATA}}</div>'\n")
     if "###NEWGROUP" in line:
         f.write("*****\n")
         f.write(" DC C'</div>'\n")
         f.write(" DC C'<div class=\"group\">'\n")
-    elif "###EH" in line:
+    elif "###EMPTHEAD" in line:
         f.write(" DC C'<div class=\"group-heading-empty\">{{:" + fname +"_DATA}}</div>'\n")
         f.write("*\n"
     else:
