@@ -17,23 +17,56 @@
 import fileinput
 import sys
 
-#output file
-f = open("OUT." + sys.argv[1],"w+")
 
-for line in fileinput.input():
-    lineList = line.split();
+
+
+#######################################################################################################################
+#                                      MAIN METHOD                                                                    #
+#######################################################################################################################
+#global stack
+globalStack = []
+#local stack based on function we're in
+localStack = []
+###flags
+#flag inside local area
+local = False
+
+#output file
+#f = open("OUT." + sys.argv[1],"w+")
+
+
+
+for line in xrange(0,1):
+    #lineList = ['HEX','{','FNAME','{','GMOa','}','POS','{','+2,23,8','}','}']
+    lineList = tokenize_line(line)
+    #to be replaced, lineList will contain example: ['bin','{','fname','{','thisName','}', etc etc etc]
     #print lineList
     if(len(lineList) != 0):
-        for word in lineList:
-            #does my word = FNAME{blahbla}
-            if(word[0] == 'F' and word[1] == 'N' and word[2] == 'A' and word[3] == 'M' and word[4] == 'E'):
-                for char in range(6,(len(word)-1)):
-                    #sys.stdout.write(word[char])
-                    f.write(word[char])
-                #print
-                # if the line contaning the FNAME also has the text HDR{YES}, then you've got a header
-                for word2 in lineList:
-                    if (word2 == 'HDR{YES}'):
-                        f.write(",h")
-                f.write("\n");
+        for word in xrange(0,len(lineList)):
+            #if contains { push to global stack
+            #if found a } pop off global stack
+            #if pop hex bin char lit, check field stack for conditions, then clear field stack
+            if '{' in lineList[word]:
+                globalStack.append(lineList[word])
+                if local:
+                    localStack.append(lineList[word])
+            elif '}' in lineList[word]:
+                #pop global, check if hex, char, bin lit
+                while '{' != globalStack.pop():
+                    pass
+                popped = globalStack.pop()
+                if popped == 'HEX' or popped == 'CHAR' or popped == 'BIN' or popped == 'LITERAL':
+                    local = False
+                    #check parms function
 
+            elif lineList[word] == 'HEX' or lineList[word] == 'CHAR' or lineList[word] == 'BIN' or lineList[word] == 'LITERAL':
+                local = True
+                globalStack.append(lineList[word])
+                localStack.append(lineList[word])
+            else:
+                globalStack.append(lineList[word])
+                if local:
+                    localStack.append(lineList[word])
+            #print "iteration " + str(word)
+            #print "Global stack: " + str(globalStack)
+            #print "Local Stack: " + str(localStack)
