@@ -6,17 +6,20 @@
 #@author SDKEll
 #currently merely writes all fnames out to a file
 # TODO: 
-#       GROUP{FNAME} ---> ,h  (Call Information header in MQLOPEN/CLOSE/GET/PUT etc)
-#       if FNAME && b4 close parens && I have nested IF && that nested if is an ATTR{TAB} --> ,cl (MQOPTGET) - conditionally sometimes a link sometimes not
-#       if Attr(TABS) --> ,l (links)
-#       ALL ELSE --> just a newline (normal collumns inside of a group)
-#       FNAME && no DLOC{} && if/else block following --> ,ic (inline conditional, for exapmple (MQOPTGET) - yes or no with an FDESC whether or not the case is true
-
-#this leaves fixed pro (ie. USING BLAH BLAH in MQLOPEN), 3 collumn rows (Decimal line in MQLGET)  
 
 import fileinput
 import sys
 import re
+
+############################################################################################
+# tokenize_line( line ):
+# this function, given a string will teokenize this line into a list with each word in the file in the list.
+# inputs: 
+#           list: string of text expected to be a line of text from a file 
+# outputs:
+#           none
+# returns: 
+#           tokenized_list: a tokenized list of the form ['This','is','a','sentence']
 
 def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
@@ -45,7 +48,25 @@ def tokenize_line( line ):          #pnambia2
     
     return tokenized_list
 
-def doCases( localStack, globalStack ):
+############################################################################################
+# doCases( localStack, globalStack, previousStack ):
+# This function performs a bunch of if/else logic to determine if a particular object fits
+# a list of cases: 
+#       GROUP{FNAME} ---> ,h  (Call Information header in MQLOPEN/CLOSE/GET/PUT etc)
+#       if FNAME && b4 close parens && I have nested IF && that nested if is an ATTR{TAB} --> ,cl (MQOPTGET) - conditionally sometimes a link sometimes not
+#       if Attr(TABS) --> ,l (links)
+#       FNAME && no DLOC{} && if/else block following --> ,ic (inline conditional, for exapmple (MQOPTGET) - yes or no with an FDESC whether or not the case is true
+#       (ie. USING BLAH BLAH in MQLOPEN), - just plain text that isn't in an HTML table - fixed pro 
+#       (Decimal line in MQLGET)  -3 collumn rows 
+#       ALL ELSE --> just a newline (normal collumns inside of a group or html table)
+# inputs: 
+#           localStack: python list type being treated as a stack of local inputs. This will be a parsed string with all data inside of a Group,Hex,Char,Bin,Literal, etc
+#           globalStack:  python list being treated as a global stack. will tell you how far indented/how many curly brackets into  the screen definition you are
+#           previousStack: python list - keeps ahold of the previous localstack before you. is used for cases such as 3 collum row.
+#  outputs:
+#           none
+# returns: a specially formatted string that is used as a command sequence for html building
+def doCases( localStack, globalStack, previousStack ):
     localIf = False
     fieldStart = -1
     #get fname, if no fname return nothing
@@ -94,13 +115,22 @@ def doCases( localStack, globalStack ):
 
 
 #######################################################################################################################
-#                                      MAIN METHOD                                                                    #
-#######################################################################################################################
+#  MAIN METHOD
+# This is the getfname main method. It will parse a screen template, and using a few stack data structures
+# calls various functions to create the command to build appropriate html for a screen.
+# inputs:
+#           The name of the file to be parsed needs to be passed to this file at the command line.
+# outputs:
+#           This function writes the command syntax for the gettbl python script into a file called out.txt in the 
+#            current directory
+# returns:
+#           none
 f = open("out.txt","w")
 #global stack
 globalStack = []
 #local stack based on function we're in
 localStack = []
+previousStack = []
 #output stack to hold onto output
 output = []
 ###flags
@@ -139,9 +169,10 @@ for line in fileinput.input():
                         or popped == 'GROUP'
                     ):
                     local = False
-                    compiledField = doCases(localStack, globalStack)
+                    compiledField = doCases(localStack, globalStack, previousStack)
                     if compiledField != "":
                         output.append(compiledField)
+                    previousStack = localStack
                     localStack = []
                     #check parms function
 
