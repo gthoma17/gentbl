@@ -11,7 +11,7 @@
 #       if Attr(TABS) --> ,l (links)
 #       ALL ELSE --> just a newline (normal collumns inside of a group)
 #       FNAME && no DLOC{} && if/else block following --> ,ic (inline conditional, for exapmple (MQOPTGET) - yes or no with an FDESC whether or not the case is true
-
+   
 #this leaves fixed pro (ie. USING BLAH BLAH in MQLOPEN), 3 collumn rows (Decimal line in MQLGET)  
 
 import fileinput
@@ -20,9 +20,23 @@ import re
 
 def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
+
+    fixed_pro = '/*->fixedPro<-*/'   #tells us which line the programmer wants to be in fixedPro
     
-    if line[0] == ';'               # screen def lines with ; are comments
+    if line[0] == ';':               # screen def lines with ; are comments
         return []
+
+    if fixed_pro in line:
+        my_list = list(line)
+        fp_index = line.find(fixed_pro)
+        print fp_index
+        my_list[fp_index] = ' '
+        my_list[fp_index+1] = ' '
+        my_list[fp_index + 14] = ' '        #replace /* and */ with blanks
+        my_list[fp_index+15] = ' '
+        
+        line = ''.join(my_list)
+        
 
     line = re.sub('/\*.*\*/', '', line) # remove any occurences of /* */
                                         # (greedy, removes largest)    
