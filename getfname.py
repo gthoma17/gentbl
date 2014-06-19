@@ -46,22 +46,46 @@ def tokenize_line( line ):          #pnambia2
     return tokenized_list
 
 def doCases( localStack, globalStack ):
+    localIf = False
+    fieldStart = -1
     #get fname, if no fname return nothing
     outString = ""
     if 'FNAME' in localStack:
-        outString = localStack[localStack.index('FNAME') + 2]
-        if 'ATTR' in localStack:
-            attrStart = localStack.index('ATTR') + 2
-            attrEnd = attrStart + localStack[attrStart:].index("}")
-            if 'TABS' in localStack[attrStart:attrEnd]:
-                outString += ",l"
-        if 'GROUP' in localStack:
+        if 'HEX' in localStack:
+            fieldStart = localStack.index('HEX')
+        elif 'BIN' in localStack:
+            fieldStart = localStack.index('BIN')
+        elif 'CHAR' in localStack:
+            fieldStart = localStack.index('CHAR')
+        elif 'LITERAL' in localStack:
+            fieldStart = localStack.index('LITERAL')
+        elif 'GROUP' in localStack:
             if 'HDR' in localStack:
                 hdrStart = localStack.index('HDR') + 2
                 hdrEnd = hdrStart + localStack[hdrStart:].index("}")
                 if 'NO' not in localStack[hdrStart:hdrEnd]:
-                    outString += ",h"  
-        if 'IF' in globalStack:
+                    outString += ",h" 
+        else:
+            return ""
+        if fieldStart <0:
+            return ""
+        else:
+            outString = localStack[localStack[fieldStart:].index('FNAME') + 2]
+            if 'IF' in localStack[fieldStart:]:
+                ifStart = localStack[fieldStart:].index('IF')
+                if localStack[ifStart + 1] == '{':
+                    print 'woohoo'
+                    parenCount = 1
+                    position = ifStart + 2
+                    while parenCount > 0:
+                        position += 1
+            elif 'ATTR' in localStack:
+                attrStart = localStack.index('ATTR') + 2
+                attrEnd = attrStart + localStack[attrStart:].index("}")
+                if 'TABS' in localStack[attrStart:attrEnd]:
+                    outString += ",l"
+
+        if 'IF' in globalStack and not localIf:
             if globalStack[globalStack.index('IF') + 1] == '{':
                 outString += ',c'
     else: 
@@ -107,7 +131,13 @@ for line in fileinput.input():
                 while '{' != globalStack.pop():
                     pass
                 popped = globalStack.pop()
-                if popped == 'HEX' or popped == 'CHAR' or popped == 'BIN' or popped == 'LITERAL' or popped == 'GROUP':
+                if (
+                           popped == 'HEX' 
+                        or popped == 'CHAR' 
+                        or popped == 'BIN' 
+                        or popped == 'LITERAL' 
+                        or popped == 'GROUP'
+                    ):
                     local = False
                     compiledField = doCases(localStack, globalStack)
                     if compiledField != "":
@@ -115,7 +145,13 @@ for line in fileinput.input():
                     localStack = []
                     #check parms function
 
-            elif lineList[word] == 'HEX' or lineList[word] == 'CHAR' or lineList[word] == 'BIN' or lineList[word] == 'LITERAL' or lineList[word] == 'GROUP':
+            elif (
+                       lineList[word] == 'HEX' 
+                    or lineList[word] == 'CHAR' 
+                    or lineList[word] == 'BIN' 
+                    or lineList[word] == 'LITERAL' 
+                    or lineList[word] == 'GROUP'
+                ):
                 local = True
                 globalStack.append(lineList[word])
                 localStack.append(lineList[word])
@@ -127,7 +163,7 @@ for line in fileinput.input():
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
 for field in output:
-    print field
+    #print field
     if ',h' in field:
         #print "###NEWGROUP"
         f.write("###NEWGROUP\n")
