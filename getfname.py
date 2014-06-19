@@ -16,7 +16,7 @@
 
 import fileinput
 import sys
-
+import re
 
 def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
@@ -39,13 +39,39 @@ def tokenize_line( line ):          #pnambia2
     
     return tokenized_list
 
+def doCases( localStack, globalStack ):
+    #get fname, if no fname return nothing
+    outString = ""
+    print "Do cases"
+    if 'FNAME' in localStack:
+        outString = localStack[localStack.index('FNAME') + 2]
+        if 'ATTR' in localStack:
+            attrStart = localStack.index('ATTR') + 2
+            attrEnd = attrStart + localStack[attrStart:].index("}")
+            if 'TABS' in localStack[attrStart:attrEnd]:
+                outString += ",l"
+        if 'GROUP' in localStack:
+            if 'HDR' in localStack:
+                hdrStart = localStack.index('HDR') + 2
+                hdrEnd = hdrStart + localStack[hdrStart:].index("}")
+                if 'NO' not in localStack[hdrStart:hdrEnd]:
+                    outString += ",h"  
+
+    else: 
+        return ""
+    return outString
+
+
 #######################################################################################################################
 #                                      MAIN METHOD                                                                    #
 #######################################################################################################################
+f = open("out.txt","w")
 #global stack
 globalStack = []
 #local stack based on function we're in
 localStack = []
+#output stack to hold onto output
+output = []
 ###flags
 #flag inside local area
 local = False
@@ -69,14 +95,20 @@ for line in fileinput.input():
                     localStack.append(lineList[word])
             elif '}' in lineList[word]:
                 #pop global, check if hex, char, bin lit
+                if local:
+                    localStack.append(lineList[word])
                 while '{' != globalStack.pop():
                     pass
                 popped = globalStack.pop()
-                if popped == 'HEX' or popped == 'CHAR' or popped == 'BIN' or popped == 'LITERAL':
+                if popped == 'HEX' or popped == 'CHAR' or popped == 'BIN' or popped == 'LITERAL' or popped == 'GROUP':
                     local = False
+                    compiledField = doCases(localStack, globalStack)
+                    if compiledField != "":
+                        output.append(compiledField)
+                    localStack = []
                     #check parms function
 
-            elif lineList[word] == 'HEX' or lineList[word] == 'CHAR' or lineList[word] == 'BIN' or lineList[word] == 'LITERAL':
+            elif lineList[word] == 'HEX' or lineList[word] == 'CHAR' or lineList[word] == 'BIN' or lineList[word] == 'LITERAL' or lineList[word] == 'GROUP':
                 local = True
                 globalStack.append(lineList[word])
                 localStack.append(lineList[word])
@@ -87,3 +119,4 @@ for line in fileinput.input():
             #print "iteration " + str(word)
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
+print output
