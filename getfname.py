@@ -74,6 +74,7 @@ def doCases( localStack, globalStack, previousStack ):
     if 'FNAME' in localStack:
         if 'HEX' in localStack:
             fieldStart = localStack.index('HEX')
+
         elif 'BIN' in localStack:
             fieldStart = localStack.index('BIN')
         elif 'CHAR' in localStack:
@@ -85,7 +86,9 @@ def doCases( localStack, globalStack, previousStack ):
                 hdrStart = localStack.index('HDR') + 2
                 hdrEnd = hdrStart + localStack[hdrStart:].index("}")
                 if 'NO' not in localStack[hdrStart:hdrEnd]:
-                    outString += ",h" 
+                    outString += localStack[localStack.index('FNAME') + 2] + ",h" 
+                    return outString
+
         else:
             return ""
         if fieldStart <0:
@@ -93,13 +96,23 @@ def doCases( localStack, globalStack, previousStack ):
         else:
             outString = localStack[localStack[fieldStart:].index('FNAME') + 2]
             if 'IF' in localStack[fieldStart:]:
-                ifStart = localStack[fieldStart:].index('IF')
+                localIf = True
+                ifStart = fieldStart + localStack[fieldStart:].index('IF')
                 if localStack[ifStart + 1] == '{':
-                    print 'woohoo'
                     parenCount = 1
-                    position = ifStart + 2
+                    position = ifStart + 1
                     while parenCount > 0:
                         position += 1
+                        if localStack[position] == '{':
+                            parenCount += 1
+                        elif localStack[position] == '}':
+                            parenCount -= 1
+                    ifEnd = position
+                    if 'ATTR' in localStack[ifStart:ifEnd]:
+                        attrStart = ifStart + localStack[ifStart:ifEnd].index('ATTR') + 2
+                        attrEnd = attrStart + localStack[attrStart:].index("}")
+                        if 'TABS' in localStack[attrStart:attrEnd]:
+                            outString += ",cl"
             elif 'ATTR' in localStack:
                 attrStart = localStack.index('ATTR') + 2
                 attrEnd = attrStart + localStack[attrStart:].index("}")
@@ -136,6 +149,8 @@ output = []
 ###flags
 #flag inside local area
 local = False
+#flag that a group is on the local stack
+groupOnStack = False
 
 #output file
 #f = open("OUT." + sys.argv[1],"w+")
@@ -181,9 +196,19 @@ for line in fileinput.input():
                     or lineList[word] == 'CHAR' 
                     or lineList[word] == 'BIN' 
                     or lineList[word] == 'LITERAL' 
-                    or lineList[word] == 'GROUP'
                 ):
                 local = True
+                if groupOnStack:
+                    compiledField = doCases(localStack, globalStack)
+                    if compiledField != "":
+                        output.append(compiledField)
+                    localStack = []
+                    groupOnStack = False
+                globalStack.append(lineList[word])
+                localStack.append(lineList[word])
+            elif lineList[word] == 'GROUP':
+                local = True
+                groupOnStack = True
                 globalStack.append(lineList[word])
                 localStack.append(lineList[word])
             else:
@@ -194,8 +219,8 @@ for line in fileinput.input():
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
 for field in output:
-    #print field
+    print field
     if ',h' in field:
-        #print "###NEWGROUP"
+        print "###NEWGROUP"
         f.write("###NEWGROUP\n")
     f.write(field + "\n")
