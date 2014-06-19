@@ -85,7 +85,7 @@ def process( line ):
             outString += inCond(fname, parms[1])
         else:
             outString += genCase(fname)
-        outString += " DC C'</div">'\n"
+        outString += " DC C'</div>'\n"
     if 'c' in parms:
         outString += " DC C'{{/if}}'\n"
     outString += "*\n"
@@ -95,7 +95,7 @@ import fileinput
 import sys
 
 print sys.argv[1]
-f = open("out\\" + sys.argv[1],"w")
+f = open("html.txt","w")
 f.write("         FDB$HTTO PREFIX,                                              +\n")
 f.write("               MEMBER=!!!!!!,                                          +\n")
 f.write("               FORMAT=EBCDIC,                                          +\n")
@@ -108,14 +108,14 @@ f.write("**********\n")
 f.write(" DC C'<div id=\"group\">'\n")
 for line in fileinput.input():
     if "###FIXEDPRO" in line:
-        f.write("DC C'<div class="fixedPro">{{:" + fname +"_DATA}}</div>'\n")
+        f.write("DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
     if "###NEWGROUP" in line:
         f.write("*****\n")
         f.write(" DC C'</div>'\n")
         f.write(" DC C'<div class=\"group\">'\n")
     elif "###EMPTHEAD" in line:
         f.write(" DC C'<div class=\"group-heading-empty\">{{:" + fname +"_DATA}}</div>'\n")
-        f.write("*\n"
+        f.write("*\n")
     else:
         thisLine = process(line)
         f.write(thisLine)

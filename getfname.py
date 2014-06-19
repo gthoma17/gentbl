@@ -62,7 +62,6 @@ def tokenize_line( line ):          #pnambia2
 def doCases( localStack, globalStack ):
     #get fname, if no fname return nothing
     outString = ""
-    print "Do cases"
     if 'FNAME' in localStack:
         outString = localStack[localStack.index('FNAME') + 2]
         if 'ATTR' in localStack:
@@ -76,7 +75,9 @@ def doCases( localStack, globalStack ):
                 hdrEnd = hdrStart + localStack[hdrStart:].index("}")
                 if 'NO' not in localStack[hdrStart:hdrEnd]:
                     outString += ",h"  
-
+        if 'IF' in globalStack:
+            if globalStack[globalStack.index('IF') + 1] == '{':
+                outString += ',c'
     else: 
         return ""
     return outString
@@ -139,4 +140,9 @@ for line in fileinput.input():
             #print "iteration " + str(word)
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
-print output
+for field in output:
+    print field
+    if ',h' in field:
+        #print "###NEWGROUP"
+        f.write("###NEWGROUP\n")
+    f.write(field + "\n")
