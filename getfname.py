@@ -20,7 +20,13 @@ import sys
 
 def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
-    line = line.rstrip()
+    
+    if line[0] == ';'               # screen def lines with ; are comments
+        return []
+
+    line = re.sub('/\*.*\*/', '', line) # remove any occurences of /* */
+                                        # (greedy, removes largest)    
+    line = line.rstrip()            #remove white space
     spaced_line = ' '
     for char in line:
         if char == '{':
