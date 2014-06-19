@@ -20,6 +20,7 @@ import sys
 
 def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
+    line = line.rstrip()
     spaced_line = ' '
     for char in line:
         if char == '{':
@@ -51,7 +52,8 @@ local = False
 
 #output file
 #f = open("OUT." + sys.argv[1],"w+")
-for line in xrange(0,1):
+#for line in xrange(0,1):
+for line in fileinput.input():
     #lineList = ['HEX','{','FNAME','{','GMOa','}','POS','{','+2,23,8','}','}']
     lineList = tokenize_line(line)
     #to be replaced, lineList will contain example: ['bin','{','fname','{','thisName','}', etc etc etc]
@@ -84,4 +86,4 @@ for line in xrange(0,1):
                     localStack.append(lineList[word])
             #print "iteration " + str(word)
             #print "Global stack: " + str(globalStack)
-            #print "Local Stack: " + str(localStack)
+            #print "Local Stack:  " + str(localStack)

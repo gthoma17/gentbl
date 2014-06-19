@@ -38,3 +38,7 @@ Icon
 OUT.input.data
 input.data
 *.swp
+
+
+# User defined
+test
