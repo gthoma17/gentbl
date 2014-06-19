@@ -18,7 +18,25 @@ import fileinput
 import sys
 
 
+def tokenize_line( line ):          #pnambia2
+    ''' takes a line and returns a tokenized list '''
+    spaced_line = ' '
+    for char in line:
+        if char == '{':
+            spaced_line += ' { '
+        elif char == '}':
+            spaced_line += ' } '    #lol, no 80 character line limit
+        elif char == '@':
+            spaced_line += 'a'
+        elif char == '#':          #FNAME's can't have @ or #
+            spaced_line += 'n'
+        else:                       
+            spaced_line += char
 
+    tokenized_list = spaced_line.split(' ')
+    tokenized_list = [c for c in tokenized_list if c != '']     #dat list comprehension
+    
+    return tokenized_list
 
 #######################################################################################################################
 #                                      MAIN METHOD                                                                    #
@@ -33,9 +51,6 @@ local = False
 
 #output file
 #f = open("OUT." + sys.argv[1],"w+")
-
-
-
 for line in xrange(0,1):
     #lineList = ['HEX','{','FNAME','{','GMOa','}','POS','{','+2,23,8','}','}']
     lineList = tokenize_line(line)

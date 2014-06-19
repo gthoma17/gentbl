@@ -62,7 +62,7 @@ def genCase ( fname ):
     outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n"
     outString += " DC C'{{:" + fname + "_DATA}}</span>'\n"
     return outString
-
+        
 def process( line ):
     outString = ""
     line = line.rstrip()
