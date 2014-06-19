@@ -62,22 +62,6 @@ def genCase ( fname ):
     outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n"
     outString += " DC C'{{:" + fname + "_DATA}}</span>'\n"
     return outString
-
-def tokenize_line( line ):          #pnambia2
-    ''' takes a line and returns a tokenized list '''
-    spaced_line = ' '
-    for char in line:
-        if char == '{':
-            spaced_line+=' { '
-        elif char == '}':
-            spaced_line+=' } '
-        else:
-            spaced_line+=char
-
-    tokenized_list = spaced_line.split(' ')
-    tokenized_list = [c for c in tokenized_list if c != '']
-    
-    return tokenized_list
         
 def process( line ):
     outString = ""
