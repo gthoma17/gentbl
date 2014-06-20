@@ -21,8 +21,8 @@
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMOPEN} POS{1,1,40}        /* @03 */
-        TEXT {CALL 'MQOPEN' USING}  }
+    LITERAL{ FNAME{CALMOPEN} POS{1,1,40}        /* @03 */ 
+        TEXT {CALL 'MQOPEN' USING}  }     /*->fixedPro<-*/       
     GROUP{ POS{2,1,79}
         DATACOL{25}
     IF {COND{OLDFMT} THEN { } ELSE {
@@ -40,7 +40,7 @@
              for this parameter. \P
         }
       } } }
-      HEX{ FNAME{OBJDESC}  POS{2,,8}
+      HEX{ FNAME{OBJDESC}  POS{2,,8} /*->3ColWithFDesc<-*/
         XNAME{OBJ DESCPRIPTOR}
         DLOC{MQLCOD@}
         ATTR{ TABS }
@@ -108,7 +108,7 @@
              This is the completion code for the MQ API call. \P
         }
       }
-      CHOICE{ FNAME{MQCCEQU} POS{5,40,20}
+      CHOICE{ FNAME{MQCCEQU} POS{5,40,20} /*->3ColWithoutFDesc<-*/
       XNAME{MQCCEQU}
       DLOC{MQLCMQCC}
        LISTV{
@@ -132,7 +132,7 @@
              completion code for the MQ API call.
         }
       }
-     CHOICE{ FNAME{RCEQU1} POS{6,40,30}
+     CHOICE{ FNAME{RCEQU1} POS{6,40,30}         /*->3ColWithFDesc<-*/
      XNAME{REASON EQU}
      DLOC{MQLCRC}
       LISTV{
@@ -461,6 +461,21 @@
         HELP{This is the name of the queue that was used for the
              MQOPEN call. \P
         }
+      }
+      HEX{ FNAME{BFRLGTH}  POS{5,,8}
+        XNAME{BUFFER LENGTH}
+        DLOC{MQLCBFRL}
+        FDESC{ COL{7} FILL{.}
+          TEXT{BufferLength} }
+        HELP{Buffer Length:  Input parameter \P\P
+             This is the length of the message in Buffer.
+        }
+      }
+      BIN{ FNAME{BFRLGTH2}  POS{5,51,8} /*->3ColWithFDesc<-*/
+        XNAME{BUFFER LENGTH}
+        DLOC{MQLCBFRL}
+        FDESC{ COL{40} FILL{.}
+          TEXT{Decimal} }
       }
     IF {COND{OLDFMT} THEN { } ELSE {
       IF { COND{GOTMHND} THEN {

@@ -28,6 +28,10 @@ def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
     fixedProFound = False
     fixed_pro = '/*->fixedPro<-*/'   #tells us which line the programmer wants to be in fixedPro
+    three_col_withFound = False
+    three_col_with = '/*->3ColWithFDesc<-*/'
+    three_col_withoutFound = False
+    three_col_without = '/*->3ColWithoutFDesc<-*/'
     
     if line[0] == ';':               # screen def lines with ; are comments
         return []
@@ -45,7 +49,36 @@ def tokenize_line( line ):          #pnambia2
         
         line = ''.join(my_list)
         #print line
+
+    if three_col_with in line:
+        three_col_withFound = True
+        #print "found fixed pro"
+        my_list = list(line)
+        col_index = line.find(three_col_with)
+        #print fp_index
+        my_list[col_index] = ' '
+        my_list[col_index+1] = ' '
+        my_list[col_index + 19] = ' '        #replace /* and */ with blanks
+        my_list[col_index+20] = ' '
         
+        line = ''.join(my_list)
+        #print line
+
+
+    if three_col_without in line:
+        three_col_withoutFound = True
+        #print "found fixed pro"
+        my_list = list(line)
+        col_index = line.find(three_col_without)
+        #print fp_index
+        my_list[col_index] = ' '
+        my_list[col_index+1] = ' '
+        my_list[col_index + 22] = ' '        #replace /* and */ with blanks
+        my_list[col_index+23] = ' '
+        
+        line = ''.join(my_list)
+        #print line
+
 
     line = re.sub('/\*.*\*/', '', line) # remove any occurences of /* */
                                         # (greedy, removes largest)    
@@ -66,7 +99,7 @@ def tokenize_line( line ):          #pnambia2
     tokenized_list = spaced_line.split(' ')
     tokenized_list = [c for c in tokenized_list if c != '']     #dat list comprehension
 
-    if fixedProFound:
+    if fixedProFound or three_col_withFound or three_col_withoutFound:
         print tokenized_list
 
     return tokenized_list
@@ -106,6 +139,8 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             fieldStart = localStack.index('CHAR')
         elif 'LITERAL' in localStack:
             fieldStart = localStack.index('LITERAL')
+
+        #HEADER CASE
         elif 'GROUP' in localStack:
             if 'HDR' in localStack:
                 hdrStart = localStack.index('HDR') + 2
@@ -121,14 +156,16 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
         else:
             fname = localStack[localStack[fieldStart:].index('FNAME') + 2]
             outList.append(fname)
+            #FIXED PRO  CASE
             if '->fixedPro<-' in localStack:
                 outList.append('###FP')
             if (getPos(localStack) == "+0" or getPos(localStack) == prevPos) and (prevPos != None):
+                #INLINE CONDITIONAL CASE
                 if prevPos == "+0" or prevPos == prevPrevPos:
                     if 'IF' in globalStack:
                         if globalStack[globalStack.index('IF') + 1] == '{':
                             if len(outputStack) != 0:
-                                if ',c' in outputStack[-1]:
+                                if ',c' in outputStack[-1] or ',l' in outputStack[-1]:
                                     sisterFname = outputStack.pop().split(',')[0]
                                     parent = outputStack.pop()
                                     parentFname = parent.split(',')[0]
@@ -137,11 +174,33 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
                                         appendString += ",c"
                                     outputStack.append(appendString)
                                     return ""
+                #3 Column Conditional where you want to show the FDesc (eg. |VALUE| 0xF | Decimal: 15|)
+                elif '->3ColWithFDesc<-' in localStack:
+                    print "HIT! " + fname + " " + getPos(localStack) + " " + prevPos
+                    print outputStack
+                    if len(outputStack) != 0:
+                        last = outputStack.pop().split(',')
+                        print last
+                        newStr = last[0]
+                        if ',l' in last:
+                            newStr += ',l'
+                        if ',c' in last:
+                            newStr += ',l'
+                        newStr += ",3cw," + fname
+                        outputStack.append(newStr)
+                        return ""
+
+                #3 Column Conditional where you don't want to show the FDesc (eg. |REASONCODE x234| CC_YOU_SUCK|) 
+                # Typically in  these cases the data is the CC type usually in a vlist
+                elif '->3ColWithoutFDesc<-' in localStack:
+                    print "HIT WITHOUT"
+            #all kinds of link logic
             if 'ATTR' in localStack:
                 attrStart = localStack.index('ATTR') + 2
                 attrEnd = attrStart + localStack[attrStart:].index("}")
                 if 'TABS' in localStack[attrStart:attrEnd]:
                     outList.append("l")
+                    #Data fnames can sometimes be conditionally links.
                     if 'IF' in localStack[fieldStart:]:
                         ifStart = fieldStart + localStack[fieldStart:].index('IF')
                         if localStack[ifStart + 1] == '{':
@@ -157,6 +216,7 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
                             if ifStart < attrStart and ifEnd > attrEnd:
                                 outList[-1] = "cl"
 
+        #is my element in general a conditional, and is it possible I won't be shown on the screen a all?
         if 'IF' in globalStack:
             if globalStack[globalStack.index('IF') + 1] == '{':
                 outList.append("c")
@@ -257,6 +317,7 @@ for line in fileinput.input():
                 ):
                 local = True
                 if groupOnStack:
+                    prevPos = None
                     compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
                     if compiledField != "":
                         output.append(compiledField)
