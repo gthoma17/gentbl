@@ -108,13 +108,14 @@ f.write("**********\n")
 f.write(" DC C'<div id=\"group\">'\n")
 for line in fileinput.input():
     if "###FIXEDPRO" in line:
+        fname = line.split(',')[0]
         f.write("DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
     if "###NEWGROUP" in line:
         f.write("*****\n")
         f.write(" DC C'</div>'\n")
         f.write(" DC C'<div class=\"group\">'\n")
     elif "###EMPTHEAD" in line:
-        f.write(" DC C'<div class=\"group-heading-empty\">{{:" + fname +"_DATA}}</div>'\n")
+        f.write(" DC C'<div class=\"group-heading-empty\"></div>'\n")
         f.write("*\n")
     else:
         thisLine = process(line)
