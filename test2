@@ -40,7 +40,7 @@
              for this parameter. \P
         }
       } } }
-      HEX{ FNAME{OBJDESC}  POS{2,,8} /*->3ColWithFDesc<-*/
+      HEX{ FNAME{OBJDESC}  POS{2,,8} 
         XNAME{OBJ DESCPRIPTOR}
         DLOC{MQLCOD@}
         ATTR{ TABS }
@@ -108,7 +108,7 @@
              This is the completion code for the MQ API call. \P
         }
       }
-      CHOICE{ FNAME{MQCCEQU} POS{5,40,20} /*->3ColWithoutFDesc<-*/
+      CHOICE{ FNAME{MQCCEQU} POS{5,40,20} 
       XNAME{MQCCEQU}
       DLOC{MQLCMQCC}
        LISTV{
@@ -132,7 +132,7 @@
              completion code for the MQ API call.
         }
       }
-     CHOICE{ FNAME{RCEQU1} POS{6,40,30}         /*->3ColWithFDesc<-*/
+     CHOICE{ FNAME{RCEQU1} POS{6,40,30} 
      XNAME{REASON EQU}
      DLOC{MQLCRC}
       LISTV{

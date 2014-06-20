@@ -99,8 +99,8 @@ def tokenize_line( line ):          #pnambia2
     tokenized_list = spaced_line.split(' ')
     tokenized_list = [c for c in tokenized_list if c != '']     #dat list comprehension
 
-    if fixedProFound or three_col_withFound or three_col_withoutFound:
-        print tokenized_list
+    #if fixedProFound or three_col_withFound or three_col_withoutFound:
+    #    print tokenized_list
 
     return tokenized_list
 
@@ -139,6 +139,8 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             fieldStart = localStack.index('CHAR')
         elif 'LITERAL' in localStack:
             fieldStart = localStack.index('LITERAL')
+        elif 'CHOICE' in localStack:
+            fieldStart = localStack.index('CHOICE')
 
         #HEADER CASE
         elif 'GROUP' in localStack:
@@ -176,11 +178,11 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
                                     return ""
                 #3 Column Conditional where you want to show the FDesc (eg. |VALUE| 0xF | Decimal: 15|)
                 elif '->3ColWithFDesc<-' in localStack:
-                    print "HIT! " + fname + " " + getPos(localStack) + " " + prevPos
-                    print outputStack
+                    #print "HIT! " + fname + " " + getPos(localStack) + " " + prevPos
+                    #print outputStack
                     if len(outputStack) != 0:
                         last = outputStack.pop().split(',')
-                        print last
+                        #print last
                         newStr = last[0]
                         if ',l' in last:
                             newStr += ',l'
@@ -192,8 +194,25 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
 
                 #3 Column Conditional where you don't want to show the FDesc (eg. |REASONCODE x234| CC_YOU_SUCK|) 
                 # Typically in  these cases the data is the CC type usually in a vlist
-                elif '->3ColWithoutFDesc<-' in localStack:
-                    print "HIT WITHOUT"
+                if 'CHOICE' in localStack:
+                    #you have more than 1024 options in your vlist
+                    if prevPos == "+0" or prevPos == prevPrevPos:
+                        last = outputStack.pop().split(',')
+                        last.insert(-1,(fname ))
+                        strOut =  ','.join(last)
+                        outputStack.append(strOut)
+                        return ""
+                    #only one vlist... so only 2 fnames to deal with
+                    else:
+                        last = outputStack.pop().split(',')
+                        newStr = last[0]
+                        if ',l' in last:
+                            newStr += ',l'
+                        if ',c' in last:
+                            newStr += ',l'
+                        newStr += "," + fname + ",3cn"
+                        outputStack.append(newStr)
+                        return ""
             #all kinds of link logic
             if 'ATTR' in localStack:
                 attrStart = localStack.index('ATTR') + 2
@@ -299,6 +318,7 @@ for line in fileinput.input():
                         or popped == 'BIN' 
                         or popped == 'LITERAL' 
                         or popped == 'GROUP'
+                        or popped == 'CHOICE'
                     ):
                     local = False
                     compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
@@ -314,6 +334,7 @@ for line in fileinput.input():
                     or lineList[word] == 'CHAR' 
                     or lineList[word] == 'BIN' 
                     or lineList[word] == 'LITERAL' 
+                    or lineList[word] == 'CHOICE'
                 ):
                 local = True
                 if groupOnStack:
