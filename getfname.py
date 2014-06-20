@@ -4,7 +4,11 @@
 #I would release this under an open source (apache) lisence but compuware owns all the code I write that is 
 #directly related to work (also my soul)
 #@author SDKEll, GTHOMAS,PNAMBIAR
-#currently merely writes all fnames out to a file
+#
+#getfname.py: Parses a Screen Definition File and strips out fnames with what kind of formatting they require for a template
+#       inputs: Screen Definition: this should be an ASCII file specified at the command line for this script to parse
+#       outputs: A file OUT.txt with instructions for the gentbl.py script to generate html corresponding to the screen def
+#       returns: None
 
 import fileinput
 import sys
