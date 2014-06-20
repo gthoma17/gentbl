@@ -63,47 +63,68 @@ def heading ( fname ):
     return " DC C'<div class=\"group-heading\">{{:" + fname +"_DATA}}</div>'\n"
  
 ###################################################################
-# threeCol(fname):
-#           This function creates html for a row in a group that has
-#                   mupltiple collumns in the data section
+# threeColNoTitle( parms ):
+#           This function creates html for a three column row
+#           where the third column is a single fname, with the 
+#           title in front of it         
+#
 # inputs:
-#           FNAME - the fnames corresponding to the data that we 
-#                   wanted to display
+#           parms - list of parameters for the group 
+# 
 # outputs:
 #           none
 # returns:
 #           the output string to write to the file 
-def threeCol ( parms ):
+def threeColWithTitle ( parms ):
     outString = ""
     cond = False
     if 'c' in parms:
         cond = True
         parms.remove('c')
-    if '3cw' in parms:
-        fname1End = parms.index("3cw") - 1
-        fname2Start = fname1End + 2
-    else:
-        fname1End = parms.index("3cn") - 1
-        fname2Start = fname1End + 2
-    outString += rightCol(parms[:fname1End+1])
 
-    if '3cw' in parms:
-        outString += leftCol(parms[fname2Start])
+    fname1End = parms.index("3cw") - 1
+    fname2Start = fname1End + 2
+
+    outString += rightCol(parms[:fname1End+1])
+    outString += leftCol(parms[fname2Start])
     outString += rightCol(parms[fname2Start:])
+
     if cond:
         parms.append('c')
     return outString
 
+###################################################################
+# threeColNoTitle( parms ):
+#           This function creates html for an three column row
+#           where the third column is only one of multiple fnames         
+#
+# inputs:
+#           parms - list of parameters for the group 
+# 
+# outputs:
+#           none
+# returns:
+#           the output string to write to the file 
 
-
-    #outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
-    #outString += " DC C'{{:" + fname1 + "_DATA}}'\n"
-    #outString += " DC C' {{:" + fname2 + "_data}}'\n"
-    #outString += " DC C'</span>'\n"
-    #outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
-    #outString += " DC C'{{:" + fname2 + "_data}}'\n"
-    #outString += " DC C'</span>'\n"
-    #return outString
+def threeColNoTitle( parms ):
+    outString = ""
+    globalCond = False
+    globalParms = []
+    theseParms = []
+    lastFname = parms.index("3cn") - 1
+    if parms[lastFname + 1] != parms[-1]:
+        for parm in parms[lastFname+1:]:
+            print parm
+            globalParms.append(parm)
+    outString += rightCol([parms[0]])
+    for fname in parms[1:lastFname+1]:
+        theseParms.append(fname)
+        theseParms.extend(globalParms)
+        outString += " DC C'{{if " + fname +"_DATA}}'\n"
+        outString += rightCol(theseParms)
+        outString += " DC C'{{/if}}'\n"
+        theseParms = []
+    return outString
 
 ###################################################################
 # condLink(fname):
@@ -196,8 +217,10 @@ def process( line ):
 def rightCol( parms ):
     outString = ""
     fname = parms[0]
-    if '3cw' in parms or '3cn' in parms:
-        outString += threeCol(parms)
+    if '3cw' in parms:
+        outString += threeColWithTitle(parms)
+    if '3cn' in parms:
+        outString += threeColNoTitle(parms)
     elif 'l' in parms:
         outString += link(fname)
     elif 'cl' in parms:
