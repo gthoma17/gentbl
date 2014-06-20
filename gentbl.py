@@ -73,8 +73,15 @@ def heading ( fname ):
 #           none
 # returns:
 #           the output string to write to the file 
-def threeCol ( fname1, fname2 ):
+def threeCol ( parms ):
     outString = ""
+    if '3cw' in parms:
+        fname1End = parms.index("3cw")
+    else:
+        fname1End = parms.index("3cn")
+
+
+
     outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
     outString += " DC C'{{:" + fname1 + "_DATA}}'\n"
     outString += " DC C' {{:" + fname2 + "_data}}'\n"
@@ -106,7 +113,7 @@ def condLink ( fname ):
     return outString
 
 ###################################################################
-# threeCol(fname):
+# inCond(fname):
 #           This function creates html for a row in a group that has
 #                   mupltiple collumns in the data section
 # inputs:
@@ -163,23 +170,31 @@ def process( line ):
     if 'h' in parms:
         outString += heading(fname)     
     else:
-        outString += " DC C'<div class=\"group-row\">'\n"
-        outString += " DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"
-        if 'l' in parms:
-            outString += link(fname)
-        elif 'cl' in parms:
-            outString += condLink (fname)
-        elif 'ic' in parms:
-            outString += inCond(parms[1], parms[2])
-        elif '3c' in parms:
-            outString += inCond(fname, parms[1])
-        else:
-            outString += genCase(fname)
+        outString += outString += " DC C'<div class=\"group-row\">'\n"
+        outString += leftCol(fname)
+        outString += rightCol(parms)
         outString += " DC C'</div>'\n"
     if 'c' in parms:
         outString += " DC C'{{/if}}'\n"
     outString += "*\n"
     return outString
+
+def rightCol( parms ):
+    outString = ""
+    if 'l' in parms:
+            outString += link(fname)
+        elif 'cl' in parms:
+            outString += condLink (fname)
+        elif 'ic' in parms:
+            outString += inCond(parms[1], parms[2])
+        elif '3cw' in parms or '3cn' in parms:
+            outString += threeCol(parms)
+        else:
+            outString += genCase(fname)
+        return outString
+
+def leftCol( fname ):
+    return " DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"
 
 import fileinput
 import sys
