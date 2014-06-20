@@ -66,11 +66,11 @@ def tokenize_line( line ):          #pnambia2
 #  outputs:
 #           none
 # returns: a specially formatted string that is used as a command sequence for html building
-def doCases( localStack, globalStack, previousStack ):
-    localIf = False
+def doCases( localStack, globalStack ):
     fieldStart = -1
     #get fname, if no fname return nothing
     outString = ""
+    outList = []
     if 'FNAME' in localStack:
         if 'HEX' in localStack:
             fieldStart = localStack.index('HEX')
@@ -94,36 +94,33 @@ def doCases( localStack, globalStack, previousStack ):
         if fieldStart <0:
             return ""
         else:
-            outString = localStack[localStack[fieldStart:].index('FNAME') + 2]
-            if 'IF' in localStack[fieldStart:]:
-                localIf = True
-                ifStart = fieldStart + localStack[fieldStart:].index('IF')
-                if localStack[ifStart + 1] == '{':
-                    parenCount = 1
-                    position = ifStart + 1
-                    while parenCount > 0:
-                        position += 1
-                        if localStack[position] == '{':
-                            parenCount += 1
-                        elif localStack[position] == '}':
-                            parenCount -= 1
-                    ifEnd = position
-                    if 'ATTR' in localStack[ifStart:ifEnd]:
-                        attrStart = ifStart + localStack[ifStart:ifEnd].index('ATTR') + 2
-                        attrEnd = attrStart + localStack[attrStart:].index("}")
-                        if 'TABS' in localStack[attrStart:attrEnd]:
-                            outString += ",cl"
-            elif 'ATTR' in localStack:
+            outList.append(localStack[localStack[fieldStart:].index('FNAME') + 2])
+            if 'ATTR' in localStack:
                 attrStart = localStack.index('ATTR') + 2
                 attrEnd = attrStart + localStack[attrStart:].index("}")
                 if 'TABS' in localStack[attrStart:attrEnd]:
-                    outString += ",l"
+                    outList.append("l")
+                    if 'IF' in localStack[fieldStart:]:
+                        ifStart = fieldStart + localStack[fieldStart:].index('IF')
+                        if localStack[ifStart + 1] == '{':
+                            parenCount = 1
+                            position = ifStart + 1
+                            while parenCount > 0:
+                                position += 1 
+                                if localStack[position] == '{':
+                                    parenCount += 1
+                                elif localStack[position] == '}':
+                                    parenCount -= 1
+                            ifEnd = position
+                            if ifStart < attrStart and ifEnd > attrEnd:
+                                outList[-1] = "cl"
 
-        if 'IF' in globalStack and not localIf:
+        if 'IF' in globalStack:
             if globalStack[globalStack.index('IF') + 1] == '{':
-                outString += ',c'
+                outList.append("c")
     else: 
         return ""
+    outString = ",".join(outList)
     return outString
 
 
@@ -184,7 +181,7 @@ for line in fileinput.input():
                         or popped == 'GROUP'
                     ):
                     local = False
-                    compiledField = doCases(localStack, globalStack, previousStack)
+                    compiledField = doCases(localStack, globalStack)
                     if compiledField != "":
                         output.append(compiledField)
                     previousStack = localStack
