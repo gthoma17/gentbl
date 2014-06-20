@@ -73,16 +73,37 @@ def heading ( fname ):
 #           none
 # returns:
 #           the output string to write to the file 
-def threeCol ( fname1, fname2 ):
+def threeCol ( parms ):
     outString = ""
-    outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
-    outString += " DC C'{{:" + fname1 + "_DATA}}'\n"
-    outString += " DC C' {{:" + fname2 + "_data}}'\n"
-    outString += " DC C'</span>'\n"
-    outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
-    outString += " DC C'{{:" + fname2 + "_data}}'\n"
-    outString += " DC C'</span>'\n"
+    cond = False
+    if 'c' in parms:
+        cond = True
+        parms.remove('c')
+    if '3cw' in parms:
+        fname1End = parms.index("3cw") - 1
+        fname2Start = fname1End + 2
+    else:
+        fname1End = parms.index("3cn") - 1
+        fname2Start = fname1End + 2
+    outString += rightCol(parms[:fname1End+1])
+
+    if '3cw' in parms:
+        outString += leftCol(parms[fname2Start])
+    outString += rightCol(parms[fname2Start:])
+    if cond:
+        parms.append('c')
     return outString
+
+
+
+    #outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
+    #outString += " DC C'{{:" + fname1 + "_DATA}}'\n"
+    #outString += " DC C' {{:" + fname2 + "_data}}'\n"
+    #outString += " DC C'</span>'\n"
+    #outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname1 + "_ID}}\">'\n"
+    #outString += " DC C'{{:" + fname2 + "_data}}'\n"
+    #outString += " DC C'</span>'\n"
+    #return outString
 
 ###################################################################
 # condLink(fname):
@@ -106,7 +127,7 @@ def condLink ( fname ):
     return outString
 
 ###################################################################
-# threeCol(fname):
+# inCond(fname):
 #           This function creates html for a row in a group that has
 #                   mupltiple collumns in the data section
 # inputs:
@@ -164,22 +185,31 @@ def process( line ):
         outString += heading(fname)     
     else:
         outString += " DC C'<div class=\"group-row\">'\n"
-        outString += " DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"
-        if 'l' in parms:
-            outString += link(fname)
-        elif 'cl' in parms:
-            outString += condLink (fname)
-        elif 'ic' in parms:
-            outString += inCond(parms[1], parms[2])
-        elif '3c' in parms:
-            outString += inCond(fname, parms[1])
-        else:
-            outString += genCase(fname)
+        outString += leftCol(fname)
+        outString += rightCol(parms)
         outString += " DC C'</div>'\n"
     if 'c' in parms:
         outString += " DC C'{{/if}}'\n"
     outString += "*\n"
     return outString
+
+def rightCol( parms ):
+    outString = ""
+    fname = parms[0]
+    if '3cw' in parms or '3cn' in parms:
+        outString += threeCol(parms)
+    elif 'l' in parms:
+        outString += link(fname)
+    elif 'cl' in parms:
+        outString += condLink (fname)
+    elif 'ic' in parms:
+        outString += inCond(parms[1], parms[2])
+    else:
+        outString += genCase(fname)
+    return outString
+
+def leftCol( fname ):
+    return " DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"
 
 import fileinput
 import sys
