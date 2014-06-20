@@ -359,8 +359,8 @@ for line in fileinput.input():
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
 for field in output:
-    print field
     if ',h' in field:
         print "###NEWGROUP"
         f.write("###NEWGROUP\n")
     f.write(field + "\n")
+    print field
