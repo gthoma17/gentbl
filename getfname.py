@@ -26,13 +26,15 @@ import re
 
 def tokenize_line( line ):          #pnambia2
     ''' takes a line and returns a tokenized list '''
-
+    fixedProFound = False
     fixed_pro = '/*->fixedPro<-*/'   #tells us which line the programmer wants to be in fixedPro
     
     if line[0] == ';':               # screen def lines with ; are comments
         return []
 
     if fixed_pro in line:
+        fixedProFound = True
+        print "found fixed pro"
         my_list = list(line)
         fp_index = line.find(fixed_pro)
         print fp_index
@@ -42,6 +44,7 @@ def tokenize_line( line ):          #pnambia2
         my_list[fp_index+15] = ' '
         
         line = ''.join(my_list)
+        print line
         
 
     line = re.sub('/\*.*\*/', '', line) # remove any occurences of /* */
@@ -62,7 +65,10 @@ def tokenize_line( line ):          #pnambia2
 
     tokenized_list = spaced_line.split(' ')
     tokenized_list = [c for c in tokenized_list if c != '']     #dat list comprehension
-    
+
+    if fixedProFound:
+        print tokenized_list
+
     return tokenized_list
 
 ############################################################################################
@@ -112,6 +118,8 @@ def doCases( localStack, globalStack ):
             return ""
         else:
             outList.append(localStack[localStack[fieldStart:].index('FNAME') + 2])
+            if '->fixedPro<-' in localStack:
+                outList.append('###FP')
             if 'ATTR' in localStack:
                 attrStart = localStack.index('ATTR') + 2
                 attrEnd = attrStart + localStack[attrStart:].index("}")
