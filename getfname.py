@@ -34,17 +34,17 @@ def tokenize_line( line ):          #pnambia2
 
     if fixed_pro in line:
         fixedProFound = True
-        print "found fixed pro"
+        #print "found fixed pro"
         my_list = list(line)
         fp_index = line.find(fixed_pro)
-        print fp_index
+        #print fp_index
         my_list[fp_index] = ' '
         my_list[fp_index+1] = ' '
         my_list[fp_index + 14] = ' '        #replace /* and */ with blanks
         my_list[fp_index+15] = ' '
         
         line = ''.join(my_list)
-        print line
+        #print line
         
 
     line = re.sub('/\*.*\*/', '', line) # remove any occurences of /* */
@@ -72,7 +72,7 @@ def tokenize_line( line ):          #pnambia2
     return tokenized_list
 
 ############################################################################################
-# doCases( localStack, globalStack, previousStack ):
+# doCases( localStack, globalStack, prevPos, prevPrevPos ):
 # This function performs a bunch of if/else logic to determine if a particular object fits
 # a list of cases: 
 #       GROUP{FNAME} ---> ,h  (Call Information header in MQLOPEN/CLOSE/GET/PUT etc)
@@ -85,11 +85,13 @@ def tokenize_line( line ):          #pnambia2
 # inputs: 
 #           localStack: python list type being treated as a stack of local inputs. This will be a parsed string with all data inside of a Group,Hex,Char,Bin,Literal, etc
 #           globalStack:  python list being treated as a global stack. will tell you how far indented/how many curly brackets into  the screen definition you are
-#           previousStack: python list - keeps ahold of the previous localstack before you. is used for cases such as 3 collum row.
+#           outputStack: python list containing all out the parsed output to this point
+#           prevPos: the position data from the last displayable field
+#           prevPrevPos: the position data from the second to last field
 #  outputs:
 #           none
 # returns: a specially formatted string that is used as a command sequence for html building
-def doCases( localStack, globalStack ):
+def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
     fieldStart = -1
     #get fname, if no fname return nothing
     outString = ""
@@ -117,9 +119,24 @@ def doCases( localStack, globalStack ):
         if fieldStart <0:
             return ""
         else:
-            outList.append(localStack[localStack[fieldStart:].index('FNAME') + 2])
+            fname = localStack[localStack[fieldStart:].index('FNAME') + 2]
+            outList.append(fname)
             if '->fixedPro<-' in localStack:
                 outList.append('###FP')
+            if (getPos(localStack) == "+0" or getPos(localStack) == prevPos) and (prevPos != None):
+                if prevPos == "+0" or prevPos == prevPrevPos:
+                    if 'IF' in globalStack:
+                        if globalStack[globalStack.index('IF') + 1] == '{':
+                            if len(outputStack) != 0:
+                                if ',c' in outputStack[-1]:
+                                    sisterFname = outputStack.pop().split(',')[0]
+                                    parent = outputStack.pop()
+                                    parentFname = parent.split(',')[0]
+                                    appendString = parentFname + ',' + sisterFname + ',' + fname + ',ic'
+                                    if ',c' in parent:
+                                        appendString += ",c"
+                                    outputStack.append(appendString)
+                                    return ""
             if 'ATTR' in localStack:
                 attrStart = localStack.index('ATTR') + 2
                 attrEnd = attrStart + localStack[attrStart:].index("}")
@@ -148,6 +165,23 @@ def doCases( localStack, globalStack ):
     outString = ",".join(outList)
     return outString
 
+#######################################################################################################################
+#  getPos( localStack )
+# This is the get position method. Gets the position data from the local stack and then returns it.
+#
+# inputs:
+#           The stack whos position data is to be returned
+# outputs:
+#           None
+# returns:
+#           The position data contained in the input stack
+def getPos( localStack ):
+    if 'POS' in localStack:
+        posData = localStack[localStack.index('POS') + 2]
+        posRow = posData.split(',')[0]
+        return posRow
+    else:
+        return None
 
 #######################################################################################################################
 #  MAIN METHOD
@@ -165,7 +199,8 @@ f = open("out.txt","w")
 globalStack = []
 #local stack based on function we're in
 localStack = []
-previousStack = []
+prevPos = None
+prevPrevPos = None
 #output stack to hold onto output
 output = []
 ###flags
@@ -206,10 +241,11 @@ for line in fileinput.input():
                         or popped == 'GROUP'
                     ):
                     local = False
-                    compiledField = doCases(localStack, globalStack)
+                    compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
                     if compiledField != "":
                         output.append(compiledField)
-                    previousStack = localStack
+                    prevPrevPos = prevPos
+                    prevPos = getPos(localStack)
                     localStack = []
                     #check parms function
 
@@ -221,7 +257,7 @@ for line in fileinput.input():
                 ):
                 local = True
                 if groupOnStack:
-                    compiledField = doCases(localStack, globalStack)
+                    compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
                     if compiledField != "":
                         output.append(compiledField)
                     localStack = []
