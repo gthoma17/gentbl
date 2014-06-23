@@ -293,12 +293,21 @@ outFile.write(" DC C'<div id=\"Template_Area\"></div>'\n")
 outFile.write(" DC C'<script id=\"Template\" type=\"text/x-jsrender\">'\n")
 outFile.write(" DC C'<div id=\"fixedArea\">'\n")
 outFile.write("**********\n")
-outFile.write(" DC C'<div id=\"group\">'\n")
+#outFile.write(" DC C'<div id=\"group\">'\n")
 for line in fileinput.input():
-    if "###FIXEDPRO" in line:
+    if fileinput.isfirstline():
+        if "###FIXEDPRO" in line:
+            outFile.write(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
+            outFile.write(" DC C'<div id=\"group\">'\n") 
+        else:
+            outFile.write(" DC C'<div id=\"group\">'\n")
+    elif "###FIXEDPRO" in line:
         fname = line.split(',')[0]
+        outFile.write(" DC C'</div>'")
         outFile.write(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
-    elif "###NEWGROUP" in line:
+        outFile.write(" DC C'<div id=\"group\">'\n")
+        continue
+    if "###NEWGROUP" in line:
         outFile.write("*****\n")
         outFile.write(" DC C'</div>'\n")
         outFile.write(" DC C'<div class=\"group\">'\n")
