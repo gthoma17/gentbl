@@ -239,6 +239,21 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
         if 'IF' in globalStack:
             if globalStack[globalStack.index('IF') + 1] == '{':
                 outList.append("c")
+
+    elif 'MENUOPT' in localStack:
+        fieldStart = localStack.index('MENUOPT')
+        
+        if localStack[fieldStart+2] != 'SEL':
+            return ""
+        else:
+            new_string = 'MOPT'
+            selector = localStack[fieldStart+4]
+            if int(selector) < 10:
+                new_string += '0'
+            new_string += selector
+            outList.append(new_string)
+            outList.append('m')
+                
     else: 
         return ""
     outString = ",".join(outList)
@@ -319,6 +334,7 @@ for line in fileinput.input():
                         or popped == 'LITERAL' 
                         or popped == 'GROUP'
                         or popped == 'CHOICE'
+                        or popped == 'MENUOPT'
                     ):
                     local = False
                     compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
@@ -335,6 +351,7 @@ for line in fileinput.input():
                     or lineList[word] == 'BIN' 
                     or lineList[word] == 'LITERAL' 
                     or lineList[word] == 'CHOICE'
+                    or lineList[word] == 'MENUOPT'
                 ):
                 local = True
                 if groupOnStack:
