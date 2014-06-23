@@ -146,13 +146,13 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
 
         #HEADER CASE
         elif 'GROUP' in localStack:
+            outString += "###NEWGROUP\n"
             if 'HDR' in localStack:
                 hdrStart = localStack.index('HDR') + 2
                 hdrEnd = hdrStart + localStack[hdrStart:].index("}")
                 if 'NO' not in localStack[hdrStart:hdrEnd]:
                     outString += localStack[localStack.index('FNAME') + 2] + ",h" 
-                    return outString
-
+            return outString
         else:
             return ""
         if fieldStart <0:
@@ -389,17 +389,8 @@ for line in fileinput.input():
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
             #raw_input()
-
+#puts the final screen into the all output data scructure 
 if len(thisOutput) != 0:
     allOutput.append(thisOutput)
     thisOutput = []
-for output in allOutput:
-    thisScreen = output.pop(0)
-    f = open(thisScreen + ".cmdlist","w")
-    print "OPENING FILE: " + thisScreen
-    for field in output:
-        if ',h' in field:
-            print "###NEWGROUP"
-            f.write("###NEWGROUP\n")
-        f.write(field + "\n")
-        print field
+
