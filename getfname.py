@@ -128,13 +128,12 @@ def tokenize_line( line ):          #pnambia2
 # returns: a specially formatted string that is used as a command sequence for html building
 def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
     fieldStart = -1
-    #get fname, if no fname return nothing
-    outString = ""
+#a list of objects that gets returned by the doCases function (as a string)
     outList = []
+
     if 'FNAME' in localStack:
         if 'HEX' in localStack:
             fieldStart = localStack.index('HEX')
-
         elif 'BIN' in localStack:
             fieldStart = localStack.index('BIN')
         elif 'CHAR' in localStack:
@@ -143,18 +142,17 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             fieldStart = localStack.index('LITERAL')
         elif 'CHOICE' in localStack:
             fieldStart = localStack.index('CHOICE')
-
-        #HEADER CASE
         elif 'GROUP' in localStack:
-            outString += "###NEWGROUP\n"
             if 'HDR' in localStack:
                 hdrStart = localStack.index('HDR') + 2
                 hdrEnd = hdrStart + localStack[hdrStart:].index("}")
                 if 'NO' not in localStack[hdrStart:hdrEnd]:
-                    outString += localStack[localStack.index('FNAME') + 2] + ",h" 
-            return outString
+                    return localStack[localStack.index('FNAME') + 2] + ",h"
         else:
             return ""
+
+
+
         if fieldStart <0:
             return ""
         else:
@@ -257,7 +255,10 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             outList.append('m')
                 
     else: 
-        return ""
+        if 'GROUP' in localStack and 'HEX' not in localStack and 'BIN' not in localStack and 'CHAR' not in localStack and 'LITERAL' not in localStack and 'CHOICE' not in localStack:
+            outList.append("###NEWGROUP")
+        else:
+            return ""
     outString = ",".join(outList)
     return outString
 
@@ -306,6 +307,8 @@ allOutput = []
 local = False
 #flag that a group is on the local stack
 groupOnStack = False
+# this is a flag to unscrew up the order of headers
+hflag = False
 
 #output file
 #f = open("OUT." + sys.argv[1],"w+")
@@ -393,4 +396,23 @@ for line in fileinput.input():
 if len(thisOutput) != 0:
     allOutput.append(thisOutput)
     thisOutput = []
-
+for output in allOutput:
+    thisScreen = output.pop(0)
+    f = open(thisScreen + ".cmdlist","w+")
+    print "OPENING FILE: " + thisScreen
+    for field in output:
+        if ',h' in field:
+            temp = field
+            hflag = True
+            continue
+        elif hflag == True:
+            print field
+            print temp
+            f.write(field+ "\n")
+            f.write(temp+ "\n")
+            temp = None
+            hflag = False
+            continue
+        print field
+        f.write(field+ "\n")
+    print
