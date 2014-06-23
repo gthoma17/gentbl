@@ -162,7 +162,7 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             outList.append(fname)
             #FIXED PRO  CASE
             if '->fixedPro<-' in localStack:
-                outList.append('###FP')
+                outList.append('###FIXEDPRO')
             if (getPos(localStack) == "+0" or getPos(localStack) == prevPos) and (prevPos != None):
                 #INLINE CONDITIONAL CASE
                 if prevPos == "+0" or prevPos == prevPrevPos:
@@ -298,7 +298,9 @@ localStack = []
 prevPos = None
 prevPrevPos = None
 #output stack to hold onto output
-output = []
+thisOutput = []
+#output list for all screens
+allOutput = []
 ###flags
 #flag inside local area
 local = False
@@ -311,8 +313,16 @@ groupOnStack = False
 for line in fileinput.input():
     #lineList = ['HEX','{','FNAME','{','GMOa','}','POS','{','+2,23,8','}','}']
     lineList = tokenize_line(line)
-    #to be replaced, lineList will contain example: ['bin','{','fname','{','thisName','}', etc etc etc]
     #print lineList
+    if ':SCREEN' in lineList:
+        if lineList[lineList.index(':SCREEN') + 2] == 'NAME':
+            #print lineList[lineList.index(':SCREEN') + 4]
+            if len(thisOutput) != 0:
+                allOutput.append(thisOutput)
+                thisOutput = []
+            thisScreen = lineList[lineList.index(':SCREEN') + 4]
+            thisOutput.insert(0,thisScreen)
+        #print lineList
     if(len(lineList) != 0):
         for word in xrange(0,len(lineList)):
             #if contains { push to global stack
@@ -339,9 +349,9 @@ for line in fileinput.input():
                         or popped == 'MENUOPT'
                     ):
                     local = False
-                    compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
+                    compiledField = doCases(localStack, globalStack, thisOutput, prevPos, prevPrevPos)
                     if compiledField != "":
-                        output.append(compiledField)
+                        thisOutput.append(compiledField)
                     prevPrevPos = prevPos
                     prevPos = getPos(localStack)
                     localStack = []
@@ -358,9 +368,9 @@ for line in fileinput.input():
                 local = True
                 if groupOnStack:
                     prevPos = None
-                    compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
+                    compiledField = doCases(localStack, globalStack, thisOutput, prevPos, prevPrevPos)
                     if compiledField != "":
-                        output.append(compiledField)
+                        thisOutput.append(compiledField)
                     localStack = []
                     groupOnStack = False
                 globalStack.append(lineList[word])
@@ -377,9 +387,17 @@ for line in fileinput.input():
             #print "iteration " + str(word)
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
-for field in output:
-    if ',h' in field:
-        print "###NEWGROUP"
-        f.write("###NEWGROUP\n")
-    f.write(field + "\n")
-    print field
+
+if len(thisOutput) != 0:
+    allOutput.append(thisOutput)
+    thisOutput = []
+for output in allOutput:
+    thisScreen = output.pop(0)
+    f = open(thisScreen + ".cmdlist","w")
+    print "OPENING FILE: " + thisScreen
+    for field in output:
+        if ',h' in field:
+            print "###NEWGROUP"
+            f.write("###NEWGROUP\n")
+        f.write(field + "\n")
+        print field
