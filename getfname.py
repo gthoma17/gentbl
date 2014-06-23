@@ -33,9 +33,11 @@ def tokenize_line( line ):          #pnambia2
     three_col_withoutFound = False
     three_col_without = '/*->3ColWithoutFDesc<-*/'
     
-    if line[0] == ';':               # screen def lines with ; are comments
-        return []
+    if line[0] == ';' or line[0] == '*':    # screen def lines with ; are comments
+        return []                           # ignoring lines starting with * for now
 
+    line = line[:72]                           #remove elements after col 72
+    
     if fixed_pro in line:
         fixedProFound = True
         #print "found fixed pro"
@@ -239,6 +241,21 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
         if 'IF' in globalStack:
             if globalStack[globalStack.index('IF') + 1] == '{':
                 outList.append("c")
+
+    elif 'MENUOPT' in localStack:
+        fieldStart = localStack.index('MENUOPT')
+        
+        if localStack[fieldStart+2] != 'SEL':
+            return ""
+        else:
+            new_string = 'MOPT'
+            selector = localStack[fieldStart+4]
+            if int(selector) < 10:
+                new_string += '0'
+            new_string += selector
+            outList.append(new_string)
+            outList.append('m')
+                
     else: 
         return ""
     outString = ",".join(outList)
@@ -287,10 +304,6 @@ output = []
 local = False
 #flag that a group is on the local stack
 groupOnStack = False
-#flag to notify computer whether we are inside or outside of a screen definition
-insideScreen = False
-#for clearing out data we don't care about
-garbage = ''
 
 #output file
 #f = open("OUT." + sys.argv[1],"w+")
@@ -301,82 +314,71 @@ for line in fileinput.input():
     #to be replaced, lineList will contain example: ['bin','{','fname','{','thisName','}', etc etc etc]
     #print lineList
     if(len(lineList) != 0):
-        if ':SCREEN' in lineList:
-            insideScreen = True
-            continue
-        elif ':END' in lineList:
-            insideScreen = False
-        elif insideScreen == True:
-            for word in xrange(0,len(lineList)):
-                #if contains { push to global stack
-                #if found a } pop off global stack
-                #if pop hex bin char lit, check field stack for conditions, then clear field stack
-                if '{' in lineList[word]:
-                    globalStack.append(lineList[word])
-                    if local:
-                        localStack.append(lineList[word])
-                elif '}' in lineList[word]:
-                    #pop global, check if hex, char, bin lit
-                    if local:
-                        localStack.append(lineList[word])
-                    while '{' != garbage:
-                        try:
-                            garbage = globalStack.pop()
-                        except IndexError:
-                            break
-                    try:
-                        popped = globalStack.pop()
-                    except IndexError:
-                        continue
-                    if (
-                               popped == 'HEX' 
-                            or popped == 'CHAR' 
-                            or popped == 'BIN' 
-                            or popped == 'LITERAL' 
-                            or popped == 'GROUP'
-                            or popped == 'CHOICE'
-                        ):
-                        local = False
-                        compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
-                        if compiledField != "":
-                            output.append(compiledField)
-                        prevPrevPos = prevPos
-                        prevPos = getPos(localStack)
-                        localStack = []
-                        #check parms function
-                elif (
-                           lineList[word] == 'HEX' 
-                        or lineList[word] == 'CHAR' 
-                        or lineList[word] == 'BIN' 
-                        or lineList[word] == 'LITERAL' 
-                        or lineList[word] == 'CHOICE'
+        for word in xrange(0,len(lineList)):
+            #if contains { push to global stack
+            #if found a } pop off global stack
+            #if pop hex bin char lit, check field stack for conditions, then clear field stack
+            if '{' in lineList[word]:
+                globalStack.append(lineList[word])
+                if local:
+                    localStack.append(lineList[word])
+            elif '}' in lineList[word]:
+                #pop global, check if hex, char, bin lit
+                if local:
+                    localStack.append(lineList[word])
+                while '{' != globalStack.pop():
+                    pass
+                popped = globalStack.pop()
+                if (
+                           popped == 'HEX' 
+                        or popped == 'CHAR' 
+                        or popped == 'BIN' 
+                        or popped == 'LITERAL' 
+                        or popped == 'GROUP'
+                        or popped == 'CHOICE'
+                        or popped == 'MENUOPT'
                     ):
-                    local = True
-                    if groupOnStack:
-                        prevPos = None
-                        compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
-                        if compiledField != "":
-                            output.append(compiledField)
-                        localStack = []
-                        groupOnStack = False
-                    globalStack.append(lineList[word])
-                    localStack.append(lineList[word])
-                elif lineList[word] == 'GROUP':
-                    local = True
-                    groupOnStack = True
-                    globalStack.append(lineList[word])
-                    localStack.append(lineList[word])
-                else:
-                    globalStack.append(lineList[word])
-                    if local:
-                        localStack.append(lineList[word])
-                #print
-                #print "iteration " + str(word)
-                #print "Global stack: " + str(globalStack)
-                #print "Local Stack:  " + str(localStack)
-                #raw_input()
+                    local = False
+                    compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
+                    if compiledField != "":
+                        output.append(compiledField)
+                    prevPrevPos = prevPos
+                    prevPos = getPos(localStack)
+                    localStack = []
+                    #check parms function
+
+            elif (
+                       lineList[word] == 'HEX' 
+                    or lineList[word] == 'CHAR' 
+                    or lineList[word] == 'BIN' 
+                    or lineList[word] == 'LITERAL' 
+                    or lineList[word] == 'CHOICE'
+                    or lineList[word] == 'MENUOPT'
+                ):
+                local = True
+                if groupOnStack:
+                    prevPos = None
+                    compiledField = doCases(localStack, globalStack, output, prevPos, prevPrevPos)
+                    if compiledField != "":
+                        output.append(compiledField)
+                    localStack = []
+                    groupOnStack = False
+                globalStack.append(lineList[word])
+                localStack.append(lineList[word])
+            elif lineList[word] == 'GROUP':
+                local = True
+                groupOnStack = True
+                globalStack.append(lineList[word])
+                localStack.append(lineList[word])
             else:
-                continue
+                globalStack.append(lineList[word])
+                if local:
+                    localStack.append(lineList[word])
+            print
+            print "iteration " + str(word)
+            print "Global stack: " + str(globalStack)
+            print "Local Stack:  " + str(localStack)
+            raw_input()
 for field in output:
     if ',h' in field:
         print "###NEWGROUP"

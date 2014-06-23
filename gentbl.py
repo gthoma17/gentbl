@@ -50,6 +50,29 @@ def link( fname ):
     return outString
 
 ###################################################################
+# menuopt(fname):
+#           This function creates html for a menuopt
+# inputs:
+#           FNAME - the fname corresponding to the data that we 
+#                   wanted to display
+# outputs:
+#           none
+# returns:
+#           outString: the output string to write to the file 
+def menuopt( fname ):
+    outString = ""
+    outString += " DC C'<div class=\"fixedLine\">'\n"
+    outString += " DC C'<div class=\"fixFloat\">'\n"
+    outString += " DC C'<span class=\"spacer\">                  </span></div>'\n"
+    outString += " DC C'<div class=\"menuopt-area\">'\n"
+    outString += " DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n"
+    outString += " DC C'{{:" + fname + "}}</a></div></div>'\n"
+    outString += " DC C'<div class=\"clearBoth\"></div>'\n"
+    outString += " DC C'<div class=\"fixedLine\"> </div>'\n"
+    outString += " DC C'<div class=\"clearBoth\"></div>'\n"
+    return outString
+
+###################################################################
 # heading(fname):
 #           This function creates html for a heading to a group
 # inputs:
@@ -203,7 +226,9 @@ def process( line ):
     if 'c' in parms:
         outString += " DC C'{{if " + fname +"_DATA}}'\n"
     if 'h' in parms:
-        outString += heading(fname)     
+        outString += heading(fname)  
+    if 'm' in parms:
+        outString += menuopt(fname)   
     else:
         outString += " DC C'<div class=\"group-row\">'\n"
         outString += leftCol(fname)
@@ -236,6 +261,7 @@ def leftCol( fname ):
 
 import fileinput
 import sys
+import os
 
 ###################################################################
 # MAIN METHOD
@@ -248,39 +274,47 @@ import sys
 #
 # returns: none. see head of file
 #
-print sys.argv[1]
-f = open("html.txt","w")
-f.write("         FDB$HTTO PREFIX,                                              +\n")
-f.write("               MEMBER=!!!!!!,                                          +\n")
-f.write("               FORMAT=EBCDIC,                                          +\n")
-f.write("               MEMTYPE=HTML\n")
-f.write("*\n")
-f.write(" DC C'<div id=\"Template_Area\"></div>'\n")
-f.write(" DC C'<script id=\"Template\" type=\"text/x-jsrender\">'\n")
-f.write(" DC C'<div id=\"fixedArea\">'\n")
-f.write("**********\n")
-f.write(" DC C'<div id=\"group\">'\n")
+#print sys.argv[1]
+screenName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
+print "screenName: " + screenName
+outFile = open(screenName + ".html","w")
+outFile.write("         FDB$HTTO PREFIX,                                              +\n")
+outFile.write("               MEMBER=")
+outFile.write(screenName + ',')
+numSpaces = 48 - len(screenName)
+print numSpaces
+for i in xrange(0,numSpaces):
+    outFile.write(' ')
+outFile.write('+\n')
+outFile.write("               FORMAT=EBCDIC,                                          +\n")
+outFile.write("               MEMTYPE=HTML\n")
+outFile.write("*\n")
+outFile.write(" DC C'<div id=\"Template_Area\"></div>'\n")
+outFile.write(" DC C'<script id=\"Template\" type=\"text/x-jsrender\">'\n")
+outFile.write(" DC C'<div id=\"fixedArea\">'\n")
+outFile.write("**********\n")
+outFile.write(" DC C'<div id=\"group\">'\n")
 for line in fileinput.input():
     if "###FIXEDPRO" in line:
         fname = line.split(',')[0]
-        f.write("DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
+        outFile.write("DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
     if "###NEWGROUP" in line:
-        f.write("*****\n")
-        f.write(" DC C'</div>'\n")
-        f.write(" DC C'<div class=\"group\">'\n")
+        outFile.write("*****\n")
+        outFile.write(" DC C'</div>'\n")
+        outFile.write(" DC C'<div class=\"group\">'\n")
     elif "###EMPTHEAD" in line:
-        f.write(" DC C'<div class=\"group-heading-empty\"></div>'\n")
-        f.write("*\n")
+        outFile.write(" DC C'<div class=\"group-heading-empty\"></div>'\n")
+        outFile.write("*\n")
     else:
         thisLine = process(line)
-        f.write(thisLine)
-f.write(" DC C'</div>'\n")
-f.write("**********\n")
-f.write(" DC C'</div>'                            <!-- END OF FIXED -->\n")
-f.write(" DC C'</script>'\n")
-f.write("*\n")
-f.write("         FDB$HTTO EOM\n")
-f.close()
+        outFile.write(thisLine)
+outFile.write(" DC C'</div>'\n")
+outFile.write("**********\n")
+outFile.write(" DC C'</div>'                            <!-- END OF FIXED -->\n")
+outFile.write(" DC C'</script>'\n")
+outFile.write("*\n")
+outFile.write("         FDB$HTTO EOM\n")
+outFile.close()
 fileinput.close()
 
 
