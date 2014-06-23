@@ -39,15 +39,15 @@
 # outputs:
 #           none
 # returns:
-#           outString: the output string to write to the file 
+#           outList: the output string to write to the file 
 def link( fname ):
-    outString = ""
-    outString += " DC C'<a class=\"group-dataTabs\"'\n"
-    outString += " DC C' id=\"{{:" + fname + "_ID}}\"'\n"
-    outString += " DC C' href=\"#-\">'\n"
-    outString += " DC C'{{:" + fname + "_DATA}}'\n"
-    outString += " DC C'</a>'\n"
-    return outString
+    outList = []
+    outList.append(" DC C'<a class=\"group-dataTabs\"'\n")
+    outList.append(" DC C' id=\"{{:" + fname + "_ID}}\"'\n")
+    outList.append(" DC C' href=\"#-\">'\n")
+    outList.append(" DC C'{{:" + fname + "_DATA}}'\n")
+    outList.append(" DC C'</a>'\n")
+    return outList
 
 ###################################################################
 # menuopt(fname):
@@ -58,19 +58,19 @@ def link( fname ):
 # outputs:
 #           none
 # returns:
-#           outString: the output string to write to the file 
+#           outList: the output string to write to the file 
 def menuopt( fname ):
-    outString = ""
-    outString += " DC C'<div class=\"fixedLine\">'\n"
-    outString += " DC C'<div class=\"fixFloat\">'\n"
-    outString += " DC C'<span class=\"spacer\">                  </span></div>'\n"
-    outString += " DC C'<div class=\"menuopt-area\">'\n"
-    outString += " DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n"
-    outString += " DC C'{{:" + fname + "}}</a></div></div>'\n"
-    outString += " DC C'<div class=\"clearBoth\"></div>'\n"
-    outString += " DC C'<div class=\"fixedLine\"> </div>'\n"
-    outString += " DC C'<div class=\"clearBoth\"></div>'\n"
-    return outString
+    outList = []
+    outList.append(" DC C'<div class=\"fixedLine\">'\n")
+    outList.append(" DC C'<div class=\"fixFloat\">'\n")
+    outList.append(" DC C'<span class=\"spacer\">                  </span></div>'\n")
+    outList.append(" DC C'<div class=\"menuopt-area\">'\n")
+    outList.append(" DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n")
+    outList.append(" DC C'{{:" + fname + "}}</a></div></div>'\n")
+    outList.append(" DC C'<div class=\"clearBoth\"></div>'\n")
+    outList.append(" DC C'<div class=\"fixedLine\"> </div>'\n")
+    outList.append(" DC C'<div class=\"clearBoth\"></div>'\n")
+    return outList
 
 ###################################################################
 # heading(fname):
@@ -99,7 +99,7 @@ def heading ( fname ):
 # returns:
 #           the output string to write to the file 
 def threeColWithTitle ( parms ):
-    outString = ""
+    outList = []
     cond = False
     if 'c' in parms:
         cond = True
@@ -108,13 +108,13 @@ def threeColWithTitle ( parms ):
     fname1End = parms.index("3cw") - 1
     fname2Start = fname1End + 2
 
-    outString += rightCol(parms[:fname1End+1])
-    outString += leftCol(parms[fname2Start])
-    outString += rightCol(parms[fname2Start:])
+    outList += rightCol(parms[:fname1End+1])
+    outList += leftCol(parms[fname2Start])
+    outList += rightCol(parms[fname2Start:])
 
     if cond:
         parms.append('c')
-    return outString
+    return outList
 
 ###################################################################
 # threeColNoTitle( parms ):
@@ -130,7 +130,7 @@ def threeColWithTitle ( parms ):
 #           the output string to write to the file 
 
 def threeColNoTitle( parms ):
-    outString = ""
+    outList = []
     globalCond = False
     globalParms = []
     theseParms = []
@@ -139,15 +139,15 @@ def threeColNoTitle( parms ):
         for parm in parms[lastFname+1:]:
             print parm
             globalParms.append(parm)
-    outString += rightCol([parms[0]])
+    outList += rightCol([parms[0]])
     for fname in parms[1:lastFname+1]:
         theseParms.append(fname)
         theseParms.extend(globalParms)
-        outString += " DC C'{{if " + fname +"_DATA}}'\n"
-        outString += rightCol(theseParms)
-        outString += " DC C'{{/if}}'\n"
+        outList.append(" DC C'{{if " + fname +"_DATA}}'\n")
+        outList += rightCol(theseParms)
+        outList.append(" DC C'{{/if}}'\n")
         theseParms = []
-    return outString
+    return outList
 
 ###################################################################
 # condLink(fname):
@@ -162,13 +162,13 @@ def threeColNoTitle( parms ):
 # returns:
 #           the output string to write to the file 
 def condLink ( fname ):
-    outString = ""
-    outString += " DC C'{{if " + fname +"_ALINK}}'\n"
-    outString += link(fname)
-    outString += " DC C'{{else}}'\n"
-    outString += genCase(fname)
-    outString += " DC C'{{/if}}'\n" 
-    return outString
+    outList = []
+    outList.append(" DC C'{{if " + fname +"_ALINK}}'\n")
+    outList += link(fname)
+    outList.append(" DC C'{{else}}'\n")
+    outList += genCase(fname)
+    outList.append(" DC C'{{/if}}'\n" )
+    return outList
 
 ###################################################################
 # inCond(fname):
@@ -182,15 +182,15 @@ def condLink ( fname ):
 # returns:
 #           the output string to write to the file 
 def inCond ( data1, data2 ):
-    outString = ""
-    outString += " DC C'{{if " + data1 + "_DATA}}'\n"
-    outString += " DC C'<span class=\"group-data\" id=\"{{:" + data1 + "_ID}}\">'\n"
-    outString += " DC C'{{:" + data1 + "_DATA}}</span>'\n"
-    outString += " DC C'{{else}}'\n"
-    outString += " DC C'<span class=\"group-data\" id=\"{{:" + data2 + "_ID}}\">'\n"
-    outString += " DC C'{{:" + data2 + "_DATA}}</span>'\n"
-    outString += " DC C'{{/if}}'\n"
-    return outString
+    outList = []
+    outList.append(" DC C'{{if " + data1 + "_DATA}}'\n")
+    outList.append(" DC C'<span class=\"group-data\" id=\"{{:" + data1 + "_ID}}\">'\n")
+    outList.append(" DC C'{{:" + data1 + "_DATA}}</span>'\n")
+    outList.append(" DC C'{{else}}'\n")
+    outList.append(" DC C'<span class=\"group-data\" id=\"{{:" + data2 + "_ID}}\">'\n")
+    outList.append(" DC C'{{:" + data2 + "_DATA}}</span>'\n")
+    outList.append(" DC C'{{/if}}'\n")
+    return outList
 ###################################################################
 # genCase(fname)
 #           This function does the general case. It puts the fname
@@ -201,12 +201,12 @@ def inCond ( data1, data2 ):
 # outputs:
 #           none
 # returns:
-#           outString: the data to be written out to file in html
+#           outList: the data to be written out to file in html
 def genCase ( fname ):
-    outString = ""
-    outString += " DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n"
-    outString += " DC C'{{:" + fname + "_DATA}}</span>'\n"
-    return outString
+    outList = []
+    outList.append(" DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n")
+    outList.append(" DC C'{{:" + fname + "_DATA}}</span>'\n")
+    return outList
         
 ###################################################################
 # process(fname)
@@ -219,45 +219,72 @@ def genCase ( fname ):
 #           a statement wrapped in DC C statements with appropriate formatting  
 #           to actually be written out to file
 def process( line ):
-    outString = ""
+    outList = []
     line = line.rstrip()
     parms = line.split(',')
     fname = parms[0]
     if 'c' in parms:
-        outString += " DC C'{{if " + fname +"_DATA}}'\n"
+        outList.append(" DC C'{{if " + fname +"_DATA}}'\n")
     if 'h' in parms:
-        outString += heading(fname)  
+        outList += heading(fname)
     if 'm' in parms:
-        outString += menuopt(fname)   
+        outList += menuopt(fname)
     else:
-        outString += " DC C'<div class=\"group-row\">'\n"
-        outString += leftCol(fname)
-        outString += rightCol(parms)
-        outString += " DC C'</div>'\n"
+        outList.append(" DC C'<div class=\"group-row\">'\n")
+        outList += leftCol(fname)
+        outList += rightCol(parms)
+        outList.append(" DC C'</div>'\n")
     if 'c' in parms:
-        outString += " DC C'{{/if}}'\n"
-    outString += "*\n"
-    return outString
+        outList.append(" DC C'{{/if}}'\n")
+    outList.append("*\n")
+    return outList
 
 def rightCol( parms ):
-    outString = ""
+    outList = []
     fname = parms[0]
     if '3cw' in parms:
-        outString += threeColWithTitle(parms)
+        outList += threeColWithTitle(parms)
     if '3cn' in parms:
-        outString += threeColNoTitle(parms)
+        outList += threeColNoTitle(parms)
     elif 'l' in parms:
-        outString += link(fname)
+        outList += link(fname)
     elif 'cl' in parms:
-        outString += condLink (fname)
+        outList += condLink (fname)
     elif 'ic' in parms:
-        outString += inCond(parms[1], parms[2])
+        outList += inCond(parms[1], parms[2])
     else:
-        outString += genCase(fname)
-    return outString
+        outList += genCase(fname)
+    return outList
 
 def leftCol( fname ):
-    return " DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"
+    return [" DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"]
+
+def fileEnd():
+    outList = []
+    outList.append("**********\n")
+    outList.append(" DC C'</div>'                            <!-- END OF FIXED -->\n")
+    outList.append(" DC C'</script>'\n")
+    outList.append("*\n")
+    outList.append("         FDB$HTTO EOM\n")
+    return outList
+
+def fileSetup( screenName ):
+    outList = []
+    outList.append("         FDB$HTTO PREFIX,                                              +\n")
+    memString = "               MEMBER="
+    memString += (screenName.upper() + ',')
+    numSpaces = 48 - len(screenName)
+    for i in xrange(0,numSpaces):
+        memString += ' '
+    outList.append(memString + '+\n')
+    outList.append("               FORMAT=EBCDIC,                                          +\n")
+    outList.append("               MEMTYPE=HTML\n")
+    outList.append("*\n")
+    outList.append(" DC C'<div id=\"Template_Area\"></div>'\n")
+    outList.append(" DC C'<script id=\"Template\" type=\"text/x-jsrender\">'\n")
+    outList.append(" DC C'<div id=\"fixedArea\">'\n")
+    outList.append("**********\n")
+    return outList
 
 import fileinput
 import sys
@@ -275,57 +302,63 @@ import os
 # returns: none. see head of file
 #
 #print sys.argv[1]
+
+#list containing all groups
+allGroups = []
+#list containing the info for the current group
+thisGroup = []
+#list containing all lines to be written to the file
+outList = []
+
+
 screenName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
-print "screenName: " + screenName
-outFile = open(screenName + ".html","w")
-outFile.write("         FDB$HTTO PREFIX,                                              +\n")
-outFile.write("               MEMBER=")
-outFile.write(screenName + ',')
-numSpaces = 48 - len(screenName)
-print numSpaces
-for i in xrange(0,numSpaces):
-    outFile.write(' ')
-outFile.write('+\n')
-outFile.write("               FORMAT=EBCDIC,                                          +\n")
-outFile.write("               MEMTYPE=HTML\n")
-outFile.write("*\n")
-outFile.write(" DC C'<div id=\"Template_Area\"></div>'\n")
-outFile.write(" DC C'<script id=\"Template\" type=\"text/x-jsrender\">'\n")
-outFile.write(" DC C'<div id=\"fixedArea\">'\n")
-outFile.write("**********\n")
-#outFile.write(" DC C'<div id=\"group\">'\n")
+
+#read in whole file, allGroups is a list of lists. each list is a group, each node is a row
 for line in fileinput.input():
-    if fileinput.isfirstline():
-        if "###FIXEDPRO" in line:
-            outFile.write(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
-            outFile.write(" DC C'<div id=\"group\">'\n") 
+    line = line.rstrip()
+    if line == '###NEWGROUP':
+        #if starting a new group, check if we need to bring a fixed pro along
+        if '###FIXEDPRO' in thisGroup[-1]:
+            oldFixedPro = thisGroup.pop()
+            allGroups.append(thisGroup)
+            thisGroup = []
+            thisGroup[0] = oldFixedPro
         else:
-            outFile.write(" DC C'<div id=\"group\">'\n")
-    elif "###FIXEDPRO" in line:
-        fname = line.split(',')[0]
-        outFile.write(" DC C'</div>'")
-        outFile.write(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
-        outFile.write(" DC C'<div id=\"group\">'\n")
-        continue
-    if "###NEWGROUP" in line:
-        outFile.write("*****\n")
-        outFile.write(" DC C'</div>'\n")
-        outFile.write(" DC C'<div class=\"group\">'\n")
-    elif "###EMPTHEAD" in line:
-        outFile.write(" DC C'<div class=\"group-heading-empty\"></div>'\n")
-        outFile.write("*\n")
+            allGroups.append(thisGroup)
+            thisGroup = []
     else:
-        thisLine = process(line)
-        outFile.write(thisLine)
-outFile.write(" DC C'</div>'\n")
-outFile.write("**********\n")
-outFile.write(" DC C'</div>'                            <!-- END OF FIXED -->\n")
-outFile.write(" DC C'</script>'\n")
-outFile.write("*\n")
-outFile.write("         FDB$HTTO EOM\n")
-outFile.close()
+        thisGroup.append(line)
+allGroups.append(thisGroup)
 fileinput.close()
 
+print allGroups
 
-    
-            
+outList += fileSetup(screenName)
+
+for group in allGroups:
+    if "###FIXEDPRO" in group[0]:
+        fname = group[0].split(',')[0]
+        outList.append(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
+        outList.append(" DC C'<div id=\"group\">'\n") 
+        outList.append("*\n") 
+        outList.pop(0)
+    elif ",h" not in group[0]:
+        outList.append(" DC C'<div id=\"group\">'\n") 
+        outList.append(" DC C'<div class=\"group-heading-empty\"></div>'\n")
+        outList.append("*\n") 
+    else:
+        outList.append(" DC C'<div id=\"group\">'\n") 
+        outList.append("*\n") 
+
+    for row in group:
+        thisRow = process(row)
+        outList += thisRow
+    outList.append("*\n") 
+    outList.append(" DC C'</div>'\n")
+
+outList += fileEnd()
+outFile = open(screenName + ".html","w")
+print "outList contains " + str(len(outList)) + " lines"
+for line in outList:
+    outFile.write(line)
+outFile.close()
