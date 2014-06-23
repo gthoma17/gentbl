@@ -61,15 +61,15 @@ def link( fname ):
 #           outString: the output string to write to the file 
 def menuopt( fname ):
     outString = ""
-    outString += " DC C'<div class=\"fixedLine\">'"
-    outString += " DC C'<div class=\"fixFloat\">'"
-    outString += " DC C'<span class=\"spacer\">                  </span></div>'"
-    outString += " DC C'<div class=\"menuopt-area\">'"
-    outString += " DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'"
-    outString += " DC C'{{:" + fname + "}}</a></div></div>'"
-    outString += " DC C'<div class=\"clearBoth\"></div>'"
-    outString += " DC C'<div class=\"fixedLine\"> </div>'"
-    outString += " DC C'<div class=\"clearBoth\"></div>'"
+    outString += " DC C'<div class=\"fixedLine\">'\n"
+    outString += " DC C'<div class=\"fixFloat\">'\n"
+    outString += " DC C'<span class=\"spacer\">                  </span></div>'\n"
+    outString += " DC C'<div class=\"menuopt-area\">'\n"
+    outString += " DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n"
+    outString += " DC C'{{:" + fname + "}}</a></div></div>'\n"
+    outString += " DC C'<div class=\"clearBoth\"></div>'\n"
+    outString += " DC C'<div class=\"fixedLine\"> </div>'\n"
+    outString += " DC C'<div class=\"clearBoth\"></div>'\n"
     return outString
 
 ###################################################################
