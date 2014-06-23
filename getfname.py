@@ -384,9 +384,11 @@ for line in fileinput.input():
                 globalStack.append(lineList[word])
                 if local:
                     localStack.append(lineList[word])
+            #print
             #print "iteration " + str(word)
             #print "Global stack: " + str(globalStack)
             #print "Local Stack:  " + str(localStack)
+            #raw_input()
 
 if len(thisOutput) != 0:
     allOutput.append(thisOutput)
