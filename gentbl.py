@@ -297,7 +297,7 @@ outFile.write(" DC C'<div id=\"group\">'\n")
 for line in fileinput.input():
     if "###FIXEDPRO" in line:
         fname = line.split(',')[0]
-        outFile.write("DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
+        outFile.write(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
     if "###NEWGROUP" in line:
         outFile.write("*****\n")
         outFile.write(" DC C'</div>'\n")
