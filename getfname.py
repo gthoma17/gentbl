@@ -33,8 +33,8 @@ def tokenize_line( line ):          #pnambia2
     three_col_withoutFound = False
     three_col_without = '/*->3ColWithoutFDesc<-*/'
     
-    if line[0] == ';':               # screen def lines with ; are comments
-        return []
+    if line[0] == ';' or line[0] == '*':    # screen def lines with ; are comments
+        return []                           # ignoring lines starting with * for now
 
     if fixed_pro in line:
         fixedProFound = True
