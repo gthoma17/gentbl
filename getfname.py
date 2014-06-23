@@ -36,6 +36,8 @@ def tokenize_line( line ):          #pnambia2
     if line[0] == ';' or line[0] == '*':    # screen def lines with ; are comments
         return []                           # ignoring lines starting with * for now
 
+    del line[72:]                           #remove elements after col 72
+    
     if fixed_pro in line:
         fixedProFound = True
         #print "found fixed pro"
