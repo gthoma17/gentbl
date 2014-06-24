@@ -343,15 +343,15 @@ for group in allGroups:
     if "###FIXEDPRO" in group[0]:
         fname = group[0].split(',')[0]
         outList.append(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
-        outList.append(" DC C'<div id=\"group\">'\n") 
+        outList.append(" DC C'<div class=\"group\">'\n") 
         outList.append("*\n") 
         outList.pop(0)
     elif ",h" not in group[0]:
-        outList.append(" DC C'<div id=\"group\">'\n") 
+        outList.append(" DC C'<div class=\"group\">'\n") 
         outList.append(" DC C'<div class=\"group-heading-empty\"></div>'\n")
         outList.append("*\n") 
     else:
-        outList.append(" DC C'<div id=\"group\">'\n") 
+        outList.append(" DC C'<div class=\"group\">'\n") 
         outList.append("*\n") 
 
     for row in group:
