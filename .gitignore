@@ -43,3 +43,6 @@ input.data
 # User defined
 out.txt
 html.txt
+
+*.html
+*.cmdlist

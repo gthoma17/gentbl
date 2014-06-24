@@ -318,10 +318,13 @@ for line in fileinput.input():
     line = line.rstrip()
     print "read in: " + line
     if line == '###NEWGROUP':
+        if len(thisGroup) < 1:
+            continue
         #if starting a new group, check if we need to bring a fixed pro along
-        if '###FIXEDPRO' in thisGroup[-1]:
+        elif '###FIXEDPRO' in thisGroup[-1]:
             oldFixedPro = thisGroup.pop()
-            allGroups.append(thisGroup)
+            if len(thisGroup) > 0:
+                allGroups.append(thisGroup)
             thisGroup = []
             thisGroup.append(oldFixedPro)
         else:
