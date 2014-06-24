@@ -316,13 +316,14 @@ screenName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 #read in whole file, allGroups is a list of lists. each list is a group, each node is a row
 for line in fileinput.input():
     line = line.rstrip()
+    print "read in: " + line
     if line == '###NEWGROUP':
         #if starting a new group, check if we need to bring a fixed pro along
         if '###FIXEDPRO' in thisGroup[-1]:
             oldFixedPro = thisGroup.pop()
             allGroups.append(thisGroup)
             thisGroup = []
-            thisGroup[0] = oldFixedPro
+            thisGroup.append(oldFixedPro)
         else:
             allGroups.append(thisGroup)
             thisGroup = []
