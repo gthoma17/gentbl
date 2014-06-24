@@ -49,7 +49,7 @@ def link( fname, cols ):
     outList.append(" DC C' href=\"#-\">'\n")
     outList.append(" DC C'{{:" + fname + "_DATA}}'\n")
     outList.append(" DC C'</a>'\n")
-    outList.append(" DC C'</span>'")
+    outList.append(" DC C'</span>'\n")
     return outList
 
 ###################################################################
