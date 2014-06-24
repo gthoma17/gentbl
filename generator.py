@@ -43,11 +43,13 @@
 #           outList: the output string to write to the file 
 def link( fname, cols ):
     outList = []
+    outList.append(" DC C'<span class=\"" + getClass(cols) + "\">'\n")
     outList.append(" DC C'<a class=\"group-dataTabs\"'\n")
     outList.append(" DC C' id=\"{{:" + fname + "_ID}}\"'\n")
     outList.append(" DC C' href=\"#-\">'\n")
     outList.append(" DC C'{{:" + fname + "_DATA}}'\n")
     outList.append(" DC C'</a>'\n")
+    outList.append(" DC C'</span>'")
     return outList
 
 ###################################################################
@@ -109,12 +111,13 @@ def threeColWithTitle ( parms, cols ):
     fname1End = parms.index("3cw") - 1
     fname2Start = fname1End + 2
 
-    outList += rightCol(parms[:fname1End+1],1)
+    outList += rightCol(parms[:fname1End+1],-1)
     outList.append(" DC C'<span class=\"group-inner-data\">{{:" + parms[fname2Start] + "_FDESC}}</span>'\n")
     outList += rightCol(parms[fname2Start:],1)
 
     if cond:
         parms.append('c')
+    print outList
     return outList
 
 ###################################################################
@@ -242,7 +245,7 @@ def rightCol( parms,cols ):
     if '3cw' in parms:
         cols -= 3
         outList += threeColWithTitle(parms, cols)
-    if '3cn' in parms:
+    elif '3cn' in parms:
         cols -= 2
         outList += threeColNoTitle(parms, cols)
     elif 'l' in parms:
@@ -255,11 +258,12 @@ def rightCol( parms,cols ):
         cols -= 1
         outList += inCond(parms[1], parms[2], cols)
     else:
+        cols -= 1
         outList += genCase(fname, cols)
-        cols -= 1
-    while cols > 0:
-        outList += dummyCol(cols)
-        cols -= 1
+    if cols > 0:
+        while cols > 0:
+            outList += dummyCol(cols)
+            cols -= 1
     return outList
 
 def leftCol( fname ):
@@ -270,6 +274,8 @@ def dummyCol( cols ):
 
 def getClass( cols ):
     if cols > 1:
+        return "group-inner-data"
+    if cols < 0:
         return "group-inner-data"
     else:
         return "group-data"
