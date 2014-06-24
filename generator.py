@@ -61,15 +61,15 @@ def link( fname ):
 #           outList: the output string to write to the file 
 def menuopt( fname ):
     outList = []
+    outList.append(" DC C'<div class=\"clearBoth\"></div>'\n")
+    outList.append(" DC C'<div class=\"fixedLine\"> </div>'\n")
+    outList.append(" DC C'<div class=\"clearBoth\"></div>'\n")
     outList.append(" DC C'<div class=\"fixedLine\">'\n")
     outList.append(" DC C'<div class=\"fixFloat\">'\n")
     outList.append(" DC C'<span class=\"spacer\">                  </span></div>'\n")
     outList.append(" DC C'<div class=\"menuopt-area\">'\n")
     outList.append(" DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n")
     outList.append(" DC C'{{:" + fname + "}}</a></div></div>'\n")
-    outList.append(" DC C'<div class=\"clearBoth\"></div>'\n")
-    outList.append(" DC C'<div class=\"fixedLine\"> </div>'\n")
-    outList.append(" DC C'<div class=\"clearBoth\"></div>'\n")
     return outList
 
 ###################################################################
