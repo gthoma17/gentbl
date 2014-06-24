@@ -1,15 +1,11 @@
-:SCREEN{ NAME{MQLOPEN} TITLE{Last WebSphere MQ Call Info}               00600000
- TEMPLATE{KAZHDTMP.MQLOPEN}                     /* @03 */
+:SCREEN{ NAME{MQLCLOSE} TITLE{Last WebSphere MQ Call Info}              00600000
+ TEMPLATE{KAZHDTMP.MQLCLOSE}                     /* @03 */
   ORG{KAZ#MQLC}                                                         00610000
   FIXED{                                                                00620000
 ;
-    DP{ FNAME{F001}     DLOC{MQLCBFR@} }       /* MSGBFR ADDRESS  */
-    DP{ FNAME{F002}     DLOC{MQLCBFRL} }       /* MSGBFR LENGTH   */
-    DP{ FNAME{F003}     DLOC{MQLCQTYP} }       /* QUEUE TYPE      */
-    DP{ FNAME{F004}     DLOC{MQLCHOBJ} }       /* HANDLE NUMBER   */
-    DP{ FNAME{F005}     DLOC{MQLCRC} }         /* REASON CODE     */
-    DP{ FNAME{F006}     DLOC{MQLCOPEN} }       /* MQ OPEN OPTION  */
-    DP{ FNAME{F007}     DLOC{MQLCOPTN} }       /* PGM OPEN OPTION */
+    DP{ FNAME{F003}     DLOC{MQLCQTYP} }
+    DP{ FNAME{F004}     DLOC{MQLCHOBJ} }
+    DP{ FNAME{F005}     DLOC{MQLCRC} }
     DP{ FNAME{F009}     DLOC{MQLCQREL} }       /* MQ RELEASE  @02 */
 ;
    COND{ FNAME{CHKCODE} DLOC{MQLCRC}
@@ -21,8 +17,8 @@
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMOPEN} POS{1,1,40}        /* @03 */ 
-        TEXT {CALL 'MQOPEN' USING}  }     /*->fixedPro<-*/       
+    LITERAL{ FNAME{CALMQCLS} POS{1,1,40}    /*->fixedPro<-*/ 
+        TEXT {CALL 'MQCLOSE' USING}  }    /* @03 */
     GROUP{ POS{2,1,79}
         DATACOL{25}
     IF {COND{OLDFMT} THEN { } ELSE {
@@ -40,45 +36,8 @@
              for this parameter. \P
         }
       } } }
-      HEX{ FNAME{OBJDESC}  POS{2,,8} 
-        XNAME{OBJ DESCPRIPTOR}
-        DLOC{MQLCOD@}
-        ATTR{ TABS }
-        HEXD{A,'WebSphere MQ Object Descriptor'}
-        COMMAND{ NAME{.DFLT}
-           CMD{CPR MQCB MQOD}
-           DESC{Display Object Descriptor Detail}
-        }
-        FDESC{ COL{7} FILL{.}
-          TEXT{ObjDesc} }
-        HELP{Object Descriptor:  Input/Output parameter \P\P
-             This is the address of the object descriptor.\P\P
-             The object descriptor is a structure that identifies the
-             object to be opened. \P
-        }
-      }
-      HEX{ FNAME{OPNOPTNS}  POS{3,,8}
-        XNAME{OPEN OPTIONS}
-        DLOC{MQLCOPTN}
-        ATTR{ TABS }
-        COMMAND{ NAME{.DFLT}
-           CMD{CPR MQM2 OPN @FF007}
-           DESC{Display OPEN Options } }
-        FDESC{ COL{7} FILL{.}
-          TEXT{Options} }
-        HELP{Options:  Input parameter \P\P
-             Options that control the action of MQOPEN. \P\P
-             At least one of the following options must be specified.
-             \P\P
-             MQOO_BROWSE                        \P
-             MQOO_INPUT_* (only one of these)   \P
-             MQOO_INQUIRE                       \P
-             MQOO_OUTPUT                        \P
-             MQOO_SET                           \P
-        }
-      }
     IF {COND{OLDFMT} THEN { } ELSE {
-      HEX{ FNAME{HOBJECT}  POS{4,,8}
+      HEX{ FNAME{HOBJECT}  POS{2,,8}
         XNAME{HOBJECT}
         DLOC{MQLCHOBJ}
         IF { COND{GOTMHND} THEN {
@@ -89,17 +48,39 @@
         }}
         FDESC{ COL{7} FILL{.}
           TEXT{Hobj} }
-        HELP{Object Handle:  Output parameter \P\P
-             The object handle represents the access that has been
-             established to an object. It must be specified on
-             subsequent message queuing calls that operate on this
-             object. \P
-             It ceases to be valid when the MQCLOSE call is
-             issued, or when the unit of processing that defines
-             the scope of the handle terminates.
+        HELP{Object Handle:  Input/Output parameter \P\P
+             This handle represents the object that is being closed.
+             The object can be of any type. The value of Hobj was
+             returned by a previous MQOPEN call. \P
+             On successful completion of the call, the queue manager
+             sets this parameter to a value that is not a valid
+             handle for the environment. \P
+             On OS/390, Hobj is set to a value that is undefined.
         }
       } } }
-      BIN{ FNAME{COMPCODE} POS{5,,8}
+      HEX{ FNAME{CLOSOPTN}  POS{3,,8}
+        XNAME{CLOSE OPTIONS}
+        DLOC{MQLCOPTN}
+        FDESC{ COL{7} FILL{.}
+          TEXT{Options} }
+        HELP{Close Options:  Input parameter \P\P
+             The Options parameter controls how the object is closed.
+             \P\P
+             Only permanent dynamic queues can be closed in more
+             than one way, being either retained or deleted.
+        }
+      }
+      CHOICE{ FNAME{MQCOEQU} POS{3,40,20}
+      XNAME{MQCOEQU}
+      DLOC{MQLCOPTN}
+       LISTV{
+            VALUE{X'00','MQCO_NONE'}
+            VALUE{X'01','MQCO_DELETE'}
+            VALUE{X'02','MQCO_DELETE_PURGE'}
+       }
+       NOMATCH{*** INVALID ***}
+      }
+      BIN{ FNAME{COMPCODE} POS{4,,8}
         XNAME{COMP CODE}
         DLOC{MQLCMQCC}
         FDESC{ COL{7} FILL{.}
@@ -108,7 +89,7 @@
              This is the completion code for the MQ API call. \P
         }
       }
-      CHOICE{ FNAME{MQCCEQU} POS{5,40,20} 
+      CHOICE{ FNAME{MQCCEQU} POS{4,40,20}
       XNAME{MQCCEQU}
       DLOC{MQLCMQCC}
        LISTV{
@@ -117,7 +98,7 @@
             VALUE{X'02','MQCC_FAILED'}
        }
       }
-      CHAR{ FNAME{REASCODE} POS{6,,4}
+      CHAR{ FNAME{REASCODE} POS{5,,4}
         XNAME{REASON CODE}
         DLOC{MQLCRC}
         FDESC{ COL{7} FILL{.}
@@ -132,7 +113,7 @@
              completion code for the MQ API call.
         }
       }
-     CHOICE{ FNAME{RCEQU1} POS{6,40,30} 
+     CHOICE{ FNAME{RCEQU1} POS{5,40,30}
      XNAME{REASON EQU}
      DLOC{MQLCRC}
       LISTV{
@@ -213,7 +194,7 @@
       }
       }
     IF { COND{CHKCODE} THEN {
-       CHOICE{ FNAME{RCEQU2}  POS{6,40,30}
+       CHOICE{ FNAME{RCEQU2}  POS{5,40,30}
        XNAME{REASON EQU}
        DLOC{MQLCRC}
          LISTV{
@@ -432,7 +413,7 @@
     }    /* end-group */
 ;
     GROUP{ POS{13,1,79}
-      HDR{YES} FNAME{EXCALINF}
+      HDR{YES} FNAME{CAINFHDR}
         TEXT{                        Expanded Call Information }
     }
 ;
@@ -459,45 +440,9 @@
         FDESC{ COL{1} FILL{.}
           TEXT{Queue Used in Call} }
         HELP{This is the name of the queue that was used for the
-             MQOPEN call. \P
+             MQCLOSE call. \P
         }
       }
-      HEX{ FNAME{BFRLGTH}  POS{5,,8}
-        XNAME{BUFFER LENGTH}
-        DLOC{MQLCBFRL}
-        FDESC{ COL{7} FILL{.}
-          TEXT{BufferLength} }
-        HELP{Buffer Length:  Input parameter \P\P
-             This is the length of the message in Buffer.
-        }
-      }
-      BIN{ FNAME{BFRLGTH2}  POS{5,51,8} /*->3ColWithFDesc<-*/
-        XNAME{BUFFER LENGTH}
-        DLOC{MQLCBFRL}
-        FDESC{ COL{40} FILL{.}
-          TEXT{Decimal} }
-      }
-    IF {COND{OLDFMT} THEN { } ELSE {
-      IF { COND{GOTMHND} THEN {
-         HEX{ FNAME{OPENOPT}  POS{3,,8}
-           XNAME{OPEN OPTIONS}
-           DLOC{MQLCOPEN}
-              ATTR{ TABS }
-              COMMAND{ NAME{.DFLT}
-                 CMD{CPR MQM2 OPN @FF006 }
-                 DESC{Displays the OPEN options} }
-           FDESC{ COL{1} FILL{.}
-             TEXT{Open Options} }
-           HELP{These are the options that the queue manager used to
-                open the queue. \P
-           }
-         }
-      }} } }
    }  /* end-group */
 ;
-  }                                              /* end-fixed */        03130000
-  HELP{The MQOPEN call is used to establish access to an object. \P\P
-       This screen displays the parameters that were used in the        03140000
-       MQOPEN call. \P
-  }                                                                     03160000
-}
+  }
