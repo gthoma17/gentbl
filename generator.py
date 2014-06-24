@@ -220,7 +220,6 @@ def genCase ( fname ):
 #           to actually be written out to file
 def process( line ):
     outList = []
-    line = line.rstrip()
     parms = line.split(',')
     fname = parms[0]
     if 'c' in parms:
@@ -285,6 +284,17 @@ def fileSetup( screenName ):
     outList.append(" DC C'<div id=\"fixedArea\">'\n")
     outList.append("**********\n")
     return outList
+def prepGroup( group ):
+    fnames = []
+    parmsPossible = ["3cw","3cn","l","cl","ic","h","c","m"]
+    for row in group:
+        parms = row.split(',')
+        if '3cw' in parms:
+            parms.append('dummyForCountingReasons')
+        fnames.append([item for item in parms if item not in parmsPossible])
+    maxLen = len(max(fnames,key=len))
+    group.append(maxLen)
+    return group
 
 import fileinput
 import sys
@@ -316,7 +326,6 @@ screenName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 #read in whole file, allGroups is a list of lists. each list is a group, each node is a row
 for line in fileinput.input():
     line = line.rstrip()
-    print "read in: " + line
     if line == '###NEWGROUP':
         if len(thisGroup) < 1:
             continue
@@ -335,11 +344,14 @@ for line in fileinput.input():
 allGroups.append(thisGroup)
 fileinput.close()
 
-print allGroups
 
 outList += fileSetup(screenName)
 
 for group in allGroups:
+    group = prepGroup(group)
+
+for group in allGroups:
+    colsNeeded = group.pop()
     if "###FIXEDPRO" in group[0]:
         fname = group[0].split(',')[0]
         outList.append(" DC C'<div class=\"fixedPro\">{{:" + fname +"_DATA}}</div>'\n")
