@@ -43,8 +43,8 @@
 #           outList: the output string to write to the file 
 def link( fname, cols ):
     outList = []
-    outList.append(" DC C'<span class=\"" + getClass(cols) + "\">'\n")
-    outList.append(" DC C'<a class=\"group-dataTabs\"'\n")
+    thisClass = getClass(cols) + "Tabs"
+    outList.append(" DC C'<a class=\"" + thisClass + "\"'\n")
     outList.append(" DC C' id=\"{{:" + fname + "_ID}}\"'\n")
     outList.append(" DC C' href=\"#-\">'\n")
     outList.append(" DC C'{{:" + fname + "_DATA}}'\n")
