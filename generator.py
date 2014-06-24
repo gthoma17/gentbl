@@ -40,7 +40,7 @@
 #           none
 # returns:
 #           outList: the output string to write to the file 
-def link( fname ):
+def link( fname, cols ):
     outList = []
     outList.append(" DC C'<a class=\"group-dataTabs\"'\n")
     outList.append(" DC C' id=\"{{:" + fname + "_ID}}\"'\n")
@@ -98,7 +98,7 @@ def heading ( fname ):
 #           none
 # returns:
 #           the output string to write to the file 
-def threeColWithTitle ( parms ):
+def threeColWithTitle ( parms, cols ):
     outList = []
     cond = False
     if 'c' in parms:
@@ -108,9 +108,9 @@ def threeColWithTitle ( parms ):
     fname1End = parms.index("3cw") - 1
     fname2Start = fname1End + 2
 
-    outList += rightCol(parms[:fname1End+1])
-    outList += leftCol(parms[fname2Start])
-    outList += rightCol(parms[fname2Start:])
+    outList += rightCol(parms[:fname1End+1],1)
+    outList.append(" DC C'<span class=\"group-inner-data\">{{:" + parms[fname2Start] + "_FDESC}}</span>'\n")
+    outList += rightCol(parms[fname2Start:],1)
 
     if cond:
         parms.append('c')
@@ -129,7 +129,7 @@ def threeColWithTitle ( parms ):
 # returns:
 #           the output string to write to the file 
 
-def threeColNoTitle( parms ):
+def threeColNoTitle( parms,cols ):
     outList = []
     globalCond = False
     globalParms = []
@@ -137,14 +137,13 @@ def threeColNoTitle( parms ):
     lastFname = parms.index("3cn") - 1
     if parms[lastFname + 1] != parms[-1]:
         for parm in parms[lastFname+1:]:
-            print parm
             globalParms.append(parm)
-    outList += rightCol([parms[0]])
+    outList += genCase(parms[0],1)
     for fname in parms[1:lastFname+1]:
         theseParms.append(fname)
         theseParms.extend(globalParms)
         outList.append(" DC C'{{if " + fname +"_DATA}}'\n")
-        outList += rightCol(theseParms)
+        outList += rightCol(theseParms,1)
         outList.append(" DC C'{{/if}}'\n")
         theseParms = []
     return outList
@@ -161,12 +160,12 @@ def threeColNoTitle( parms ):
 #           none
 # returns:
 #           the output string to write to the file 
-def condLink ( fname ):
+def condLink ( fname, cols ):
     outList = []
     outList.append(" DC C'{{if " + fname +"_ALINK}}'\n")
-    outList += link(fname)
+    outList += link(fname, cols)
     outList.append(" DC C'{{else}}'\n")
-    outList += genCase(fname)
+    outList += genCase(fname, cols)
     outList.append(" DC C'{{/if}}'\n" )
     return outList
 
@@ -181,14 +180,12 @@ def condLink ( fname ):
 #           none
 # returns:
 #           the output string to write to the file 
-def inCond ( data1, data2 ):
+def inCond ( data1, data2, cols ):
     outList = []
     outList.append(" DC C'{{if " + data1 + "_DATA}}'\n")
-    outList.append(" DC C'<span class=\"group-data\" id=\"{{:" + data1 + "_ID}}\">'\n")
-    outList.append(" DC C'{{:" + data1 + "_DATA}}</span>'\n")
+    outList.append(genCase(data1,cols))
     outList.append(" DC C'{{else}}'\n")
-    outList.append(" DC C'<span class=\"group-data\" id=\"{{:" + data2 + "_ID}}\">'\n")
-    outList.append(" DC C'{{:" + data2 + "_DATA}}</span>'\n")
+    outList.append(genCase(data2,cols))
     outList.append(" DC C'{{/if}}'\n")
     return outList
 ###################################################################
@@ -202,9 +199,9 @@ def inCond ( data1, data2 ):
 #           none
 # returns:
 #           outList: the data to be written out to file in html
-def genCase ( fname ):
+def genCase ( fname, cols ):
     outList = []
-    outList.append(" DC C'<span class=\"group-data\" id=\"{{:" + fname + "_ID}}\">'\n")
+    outList.append(" DC C'<span class=\"" + getClass(cols) + "\" id=\"{{:" + fname + "_ID}}\">'\n")
     outList.append(" DC C'{{:" + fname + "_DATA}}</span>'\n")
     return outList
         
@@ -218,7 +215,7 @@ def genCase ( fname ):
 # returns:
 #           a statement wrapped in DC C statements with appropriate formatting  
 #           to actually be written out to file
-def process( line ):
+def process( line,cols ):
     outList = []
     parms = line.split(',')
     fname = parms[0]
@@ -231,32 +228,50 @@ def process( line ):
     else:
         outList.append(" DC C'<div class=\"group-row\">'\n")
         outList += leftCol(fname)
-        outList += rightCol(parms)
+        outList += rightCol(parms, cols)
         outList.append(" DC C'</div>'\n")
     if 'c' in parms:
         outList.append(" DC C'{{/if}}'\n")
     outList.append("*\n")
     return outList
 
-def rightCol( parms ):
+def rightCol( parms,cols ):
     outList = []
     fname = parms[0]
     if '3cw' in parms:
-        outList += threeColWithTitle(parms)
+        cols -= 3
+        outList += threeColWithTitle(parms, cols)
     if '3cn' in parms:
-        outList += threeColNoTitle(parms)
+        cols -= 2
+        outList += threeColNoTitle(parms, cols)
     elif 'l' in parms:
-        outList += link(fname)
+        cols -= 1
+        outList += link(fname, cols)
     elif 'cl' in parms:
-        outList += condLink (fname)
+        cols -= 1
+        outList += condLink (fname, cols)
     elif 'ic' in parms:
-        outList += inCond(parms[1], parms[2])
+        cols -= 1
+        outList += inCond(parms[1], parms[2], cols)
     else:
-        outList += genCase(fname)
+        outList += genCase(fname, cols)
+        cols -= 1
+    while cols > 0:
+        outList += dummyCol(cols)
+        cols -= 1
     return outList
 
 def leftCol( fname ):
     return [" DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"]
+
+def dummyCol( cols ):
+    return [" DC C'<span class=\"" + getClass(cols) + "\"></span>'\n"]
+
+def getClass( cols ):
+    if cols > 1:
+        return "group-inner-data"
+    else:
+        return "group-data"
 
 def fileEnd():
     outList = []
@@ -367,7 +382,7 @@ for group in allGroups:
         outList.append("*\n") 
 
     for row in group:
-        thisRow = process(row)
+        thisRow = process(row,colsNeeded)
         outList += thisRow
     outList.append("*\n") 
     outList.append(" DC C'</div>'\n")
