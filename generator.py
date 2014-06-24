@@ -134,6 +134,8 @@ def threeColWithTitle ( parms, cols ):
 #           the output string to write to the file 
 
 def threeColNoTitle( parms,cols ):
+    print "doing 3cn"
+    print "cols: " + str(cols)
     outList = []
     globalCond = False
     globalParms = []
@@ -142,14 +144,21 @@ def threeColNoTitle( parms,cols ):
     if parms[lastFname + 1] != parms[-1]:
         for parm in parms[lastFname+1:]:
             globalParms.append(parm)
-    outList += genCase(parms[0],1)
+    outList += genCase(parms[0],-1)
+    cols -= 2
+    print "doing loop on: "
+    print parms[1:lastFname+1]
+    cols *= -1
     for fname in parms[1:lastFname+1]:
+        print "doing fname: " + fname
         theseParms.append(fname)
         theseParms.extend(globalParms)
         outList.append(" DC C'{{if " + fname +"_DATA}}'\n")
-        outList += rightCol(theseParms,1)
+        outList += rightCol(theseParms,cols)
+        cols += 1
         outList.append(" DC C'{{/if}}'\n")
         theseParms = []
+    print outList[-1]
     return outList
 
 ###################################################################
@@ -220,6 +229,8 @@ def genCase ( fname, cols ):
 #           a statement wrapped in DC C statements with appropriate formatting  
 #           to actually be written out to file
 def process( line,cols ):
+    print "doing process"
+    print "cols: " + str(cols)
     outList = []
     parms = line.split(',')
     fname = parms[0]
@@ -240,26 +251,29 @@ def process( line,cols ):
     return outList
 
 def rightCol( parms,cols ):
+    print "doing rightCol"
+    print "cols: " + str(cols)
     outList = []
     fname = parms[0]
     if '3cw' in parms:
-        cols -= 3
         outList += threeColWithTitle(parms, cols)
+        cols -= 3
     elif '3cn' in parms:
-        cols -= 2
         outList += threeColNoTitle(parms, cols)
+        cols -= 2
+        print "cols: " + str(cols)
     elif 'l' in parms:
-        cols -= 1
         outList += link(fname, cols)
+        cols -= 1
     elif 'cl' in parms:
-        cols -= 1
         outList += condLink (fname, cols)
+        cols -= 1
     elif 'ic' in parms:
-        cols -= 1
         outList += inCond(parms[1], parms[2], cols)
-    else:
         cols -= 1
+    else:
         outList += genCase(fname, cols)
+        cols -= 1
     if cols > 0:
         while cols > 0:
             outList += dummyCol(cols)
@@ -313,6 +327,8 @@ def prepGroup( group ):
         parms = row.split(',')
         if '3cw' in parms:
             parms.append('dummyForCountingReasons')
+        if '3cn' in parms:
+            parms = ['dummyForCountingReasons','dummyForCountingReasons']
         fnames.append([item for item in parms if item not in parmsPossible])
     maxLen = len(max(fnames,key=len))
     group.append(maxLen)
