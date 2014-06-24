@@ -290,7 +290,6 @@ def getPos( localStack ):
 #            current directory
 # returns:
 #           none
-f = open("out.txt","w")
 #global stack
 globalStack = []
 #local stack based on function we're in
