@@ -117,7 +117,6 @@ def threeColWithTitle ( parms, cols ):
 
     if cond:
         parms.append('c')
-    print outList
     return outList
 
 ###################################################################
@@ -134,8 +133,6 @@ def threeColWithTitle ( parms, cols ):
 #           the output string to write to the file 
 
 def threeColNoTitle( parms,cols ):
-    print "doing 3cn"
-    print "cols: " + str(cols)
     outList = []
     globalCond = False
     globalParms = []
@@ -146,11 +143,8 @@ def threeColNoTitle( parms,cols ):
             globalParms.append(parm)
     outList += genCase(parms[0],-1)
     cols -= 2
-    print "doing loop on: "
-    print parms[1:lastFname+1]
     cols *= -1
     for fname in parms[1:lastFname+1]:
-        print "doing fname: " + fname
         theseParms.append(fname)
         theseParms.extend(globalParms)
         outList.append(" DC C'{{if " + fname +"_DATA}}'\n")
@@ -158,7 +152,6 @@ def threeColNoTitle( parms,cols ):
         cols += 1
         outList.append(" DC C'{{/if}}'\n")
         theseParms = []
-    print outList[-1]
     return outList
 
 ###################################################################
@@ -196,9 +189,9 @@ def condLink ( fname, cols ):
 def inCond ( data1, data2, cols ):
     outList = []
     outList.append(" DC C'{{if " + data1 + "_DATA}}'\n")
-    outList.append(genCase(data1,cols))
+    outList += genCase(data1,cols)
     outList.append(" DC C'{{else}}'\n")
-    outList.append(genCase(data2,cols))
+    outList += genCase(data2,cols)
     outList.append(" DC C'{{/if}}'\n")
     return outList
 ###################################################################
@@ -229,8 +222,6 @@ def genCase ( fname, cols ):
 #           a statement wrapped in DC C statements with appropriate formatting  
 #           to actually be written out to file
 def process( line,cols ):
-    print "doing process"
-    print "cols: " + str(cols)
     outList = []
     parms = line.split(',')
     fname = parms[0]
@@ -251,8 +242,6 @@ def process( line,cols ):
     return outList
 
 def rightCol( parms,cols ):
-    print "doing rightCol"
-    print "cols: " + str(cols)
     outList = []
     fname = parms[0]
     if '3cw' in parms:
@@ -261,7 +250,6 @@ def rightCol( parms,cols ):
     elif '3cn' in parms:
         outList += threeColNoTitle(parms, cols)
         cols -= 2
-        print "cols: " + str(cols)
     elif 'l' in parms:
         outList += link(fname, cols)
         cols -= 1
@@ -412,7 +400,9 @@ for group in allGroups:
 
 outList += fileEnd()
 outFile = open(screenName + ".html","w")
+print "Opening file: " + screenName + ".html"
 print "outList contains " + str(len(outList)) + " lines"
 for line in outList:
     outFile.write(line)
+outFile.write("*\n*\n*\n")
 outFile.close()
