@@ -91,16 +91,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'<div class="group">'
 *
  DC C'<div class="group-heading">{{:EXCALINF_DATA}}</div>'
- DC C'<div class="group-row">'
- DC C'<span class="group-desc">{{:EXCALINF_FDESC}}</span>'
- DC C'<span class="group-data" id="{{:EXCALINF_ID}}">'
- DC C'{{:EXCALINF_DATA}}</span>'
- DC C'</div>'
-*
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
 *
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
@@ -296,11 +286,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'<span class="group-data" id="{{:EXCALINF_ID}}">'
  DC C'{{:EXCALINF_DATA}}</span>'
  DC C'</div>'
-*
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
 *
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
@@ -502,11 +487,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'{{:EXCALINF_DATA}}</span>'
  DC C'</div>'
 *
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
-*
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
  DC C'<span class="group-data" id="{{:QMGRNAME_ID}}">'
@@ -653,11 +633,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'<span class="group-data" id="{{:EXCALINF_ID}}">'
  DC C'{{:EXCALINF_DATA}}</span>'
  DC C'</div>'
-*
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
 *
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
@@ -857,11 +832,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'{{:EXCALINF_DATA}}</span>'
  DC C'</div>'
 *
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
-*
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
  DC C'<span class="group-data" id="{{:QMGRNAME_ID}}">'
@@ -1059,11 +1029,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'{{:EXCALINF_DATA}}</span>'
  DC C'</div>'
 *
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
-*
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
  DC C'<span class="group-data" id="{{:QMGRNAME_ID}}">'
@@ -1244,11 +1209,6 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'{{:EXCALINF_DATA}}</span>'
  DC C'</div>'
 *
-*
- DC C'</div>'
- DC C'<div class="group">'
- DC C'<div class="group-heading-empty"></div>'
-*
  DC C'<div class="group-row">'
  DC C'<span class="group-desc">{{:QMGRNAME_FDESC}}</span>'
  DC C'<span class="group-data" id="{{:QMGRNAME_ID}}">'
@@ -1297,6 +1257,9 @@ KAZHDTMP TITLE '- HTML TEMPLATES'
  DC C'</script>'
 *
          FDB$HTTO EOM
+*
+*
+*
 *
 *
 *
