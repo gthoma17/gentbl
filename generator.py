@@ -227,17 +227,15 @@ def process( line,cols ):
     fname = parms[0]
     if 'c' in parms:
         outList.append(" DC C'{{if " + fname +"_DATA}}'\n")
-
     if 'h' in parms:
         outList += heading(fname)
-    elif 'm' in parms:
+    if 'm' in parms:
         outList += menuopt(fname)
     else:
         outList.append(" DC C'<div class=\"group-row\">'\n")
         outList += leftCol(fname)
         outList += rightCol(parms, cols)
         outList.append(" DC C'</div>'\n")
-        
     if 'c' in parms:
         outList.append(" DC C'{{/if}}'\n")
     outList.append("*\n")
