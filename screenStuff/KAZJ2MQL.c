@@ -67,7 +67,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMOPEN} POS{1,1,40}        /* @03 */
+    LITERAL{ FNAME{CALMOPEN} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQOPEN' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
@@ -559,7 +559,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMQGET} POS{1,1,40}                /* @03 */
+    LITERAL{ FNAME{CALMQGET} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQGET' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
@@ -1168,7 +1168,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMQPUT} POS{1,1,40}            /* @03 */
+    LITERAL{ FNAME{CALMQPUT} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQPUT' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
@@ -1756,7 +1756,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMPT1} POS{1,1,40}             /* @03 */
+    LITERAL{ FNAME{CALMPT1} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQPUT1' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
@@ -2289,7 +2289,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMQNQ} POS{1,1,40}         /* @03 */
+    LITERAL{ FNAME{CALMQNQ} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQINQ' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
@@ -2838,7 +2838,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMQSET} POS{1,1,40}        /* @03 */
+    LITERAL{ FNAME{CALMQSET} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQSET' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
@@ -3389,7 +3389,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
    COND{FNAME{OLDFMT} DLOC{MQLC@FMT}
          COMPOP{CLC,'1',E} }
 ;
-    LITERAL{ FNAME{CALMQCLS} POS{1,1,40}         /* @03 */
+    LITERAL{ FNAME{CALMQCLS} POS{1,1,40} /*->fixedPro<-*/ /* @03 */
         TEXT {CALL 'MQCLOSE' USING}  }
     GROUP{ POS{2,1,79}
         DATACOL{25}
