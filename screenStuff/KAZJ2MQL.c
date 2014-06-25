@@ -1051,7 +1051,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
     }    /* end-group */
 ;
     GROUP{ POS{13,1,79}
-      HDR{YES}
+      HDR{YES} FNAME{EXCALINF}
         TEXT{                        Expanded Call Information }
     }
 ;
