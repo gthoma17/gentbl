@@ -676,7 +676,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              Length in bytes of the Buffer area.
         }
       }
-      BIN{ FNAME{BFRLGTH2}  POS{5,51,8}
+      BIN{ FNAME{BFRLGTH2}  POS{5,51,8} /*->3ColWithFDesc<-*/
         XNAME{BUFFER LENGTH}
         DLOC{MQLCBFRL}
         FDESC{ COL{40} FILL{.}
@@ -712,7 +712,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              no application data.
         }
       }
-      BIN{ FNAME{DATLGTH2}  POS{7,51,8}
+      BIN{ FNAME{DATLGTH2}  POS{7,51,8} /*->3ColWithFDesc<-*/
         XNAME{DATA LENGTH}
         DLOC{MQLCDTAL}
         FDESC{ COL{40} FILL{.}
@@ -1286,7 +1286,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              This is the length of the message in Buffer.
         }
       }
-      BIN{ FNAME{BFRLGTH2}  POS{5,51,8}
+      BIN{ FNAME{BFRLGTH2}  POS{5,51,8} /*->3ColWithFDesc<-*/
         XNAME{BUFFER LENGTH}
         DLOC{MQLCBFRL}
         FDESC{ COL{40} FILL{.}
@@ -1855,7 +1855,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              This is the length of the message in Buffer.
         }
       }
-      BIN{ FNAME{BFRLGTH2}  POS{5,51,8}
+      BIN{ FNAME{BFRLGTH2}  POS{5,51,8} /*->3ColWithFDesc<-*/
         XNAME{BUFFER LENGTH}
         DLOC{MQLCBFRL}
         FDESC{ COL{40} FILL{.}
@@ -2339,7 +2339,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              maximum number allowed is 256.
         }
       }
-      BIN{ FNAME{SELCNT2}  POS{3,51,8}
+      BIN{ FNAME{SELCNT2}  POS{3,51,8} /*->3ColWithFDesc<-*/
         XNAME{SELECTOR COUNT}
         DLOC{MQLCSEL#}
         FDESC{ COL{40} FILL{.}
@@ -2369,7 +2369,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              Zero is a valid value. \P
         }
       }
-      BIN{ FNAME{INTCNT2}  POS{5,51,8}
+      BIN{ FNAME{INTCNT2}  POS{5,51,8} /*->3ColWithFDesc<-*/
         XNAME{INTEGER COUNT}
         DLOC{MQLCINT#}
         FDESC{ COL{40} FILL{.}
@@ -2396,7 +2396,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              This is the length in bytes of the CharAttrs parameter.
         }
       }
-      BIN{ FNAME{CHRLGTH2}  POS{7,51,8}
+      BIN{ FNAME{CHRLGTH2}  POS{7,51,8} /*->3ColWithFDesc<-*/ 
         XNAME{CHAR ATTR LENGTH}
         DLOC{MQLCCHRL}
         FDESC{ COL{40} FILL{.}
@@ -2888,7 +2888,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              maximum number allowed is 256.
         }
       }
-      BIN{ FNAME{SELCNT2}  POS{3,51,8}
+      BIN{ FNAME{SELCNT2}  POS{3,51,8} /*->3ColWithFDesc<-*/
         XNAME{SELECTOR COUNT}
         DLOC{MQLCSEL#}
         FDESC{ COL{40} FILL{.}
@@ -2920,7 +2920,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              if there are none.
         }
       }
-      BIN{ FNAME{INTCNT2}  POS{5,51,8}
+      BIN{ FNAME{INTCNT2}  POS{5,51,8} /*->3ColWithFDesc<-*/
         XNAME{INTEGER COUNT}
         DLOC{MQLCINT#}
         FDESC{ COL{40} FILL{.}
@@ -2947,7 +2947,7 @@ KAZJ2MQL FDB$CSCT                                                       00580000
              This is the length in bytes of the CharAttrs parameter.
         }
       }
-      BIN{ FNAME{CHRLGTH2}  POS{7,51,8}
+      BIN{ FNAME{CHRLGTH2}  POS{7,51,8} /*->3ColWithFDesc<-*/
         XNAME{CHAR ATTR LENGTH}
         DLOC{MQLCCHRL}
         FDESC{ COL{40} FILL{.}
