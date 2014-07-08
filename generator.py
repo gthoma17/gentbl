@@ -72,7 +72,7 @@ def menuopt( fname ):
     outList.append(" DC C'<span class=\"spacer\">                  </span></div>'\n")
     outList.append(" DC C'<div class=\"menuopt-area\">'\n")
     outList.append(" DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n")
-    outList.append(" DC C'{{:" + fname + "}}</a></div></div>'\n")
+    outList.append(" DC C'{{:" + fname + "_DATA}}</a></div></div>'\n")
     return outList
 
 ###################################################################
@@ -352,6 +352,9 @@ screenName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 #read in whole file, allGroups is a list of lists. each list is a group, each node is a row
 for line in fileinput.input():
     line = line.rstrip()
+    if '//' in line:
+        line.find('//')
+        line = line[:line.find('//')]
     if line == '###NEWGROUP':
         if len(thisGroup) < 1:
             continue
@@ -393,7 +396,10 @@ for group in allGroups:
         outList.append("*\n") 
 
     for row in group:
-        thisRow = process(row,colsNeeded)
+        if '###INSERT' in row:
+            thisRow = row.split('|')[1]
+        else:
+            thisRow = process(row,colsNeeded)
         outList += thisRow
     outList.append("*\n") 
     outList.append(" DC C'</div>'\n")

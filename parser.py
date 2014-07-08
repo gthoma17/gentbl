@@ -132,10 +132,13 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
     #get fname, if no fname return nothing
     outString = ""
     outList = []
-    if 'FNAME' in localStack:
+    if (
+            'FNAME' in localStack                #only do stuff if theres an fname
+            and not hasTag(globalStack, 'TABLE') #which isn't in a table 
+            and not hasTag(globalStack, 'DP')    #and isn't in a DP
+        ):
         if 'HEX' in localStack:
             fieldStart = localStack.index('HEX')
-
         elif 'BIN' in localStack:
             fieldStart = localStack.index('BIN')
         elif 'CHAR' in localStack:
@@ -144,6 +147,9 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             fieldStart = localStack.index('LITERAL')
         elif 'CHOICE' in localStack:
             fieldStart = localStack.index('CHOICE')
+        elif 'TM' in localStack:
+            print "found TM"
+            fieldStart = localStack.index('TM')
 
         #HEADER CASE
         elif 'GROUP' in localStack:
@@ -160,11 +166,13 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             return ""
         else:
             fname = localStack[localStack[fieldStart:].index('FNAME') + 2]
+            #print fname
             outList.append(fname)
             #FIXED PRO  CASE
             if '->fixedPro<-' in localStack:
                 outList.append('###FIXEDPRO')
             if (getPos(localStack) == "+0" or getPos(localStack) == prevPos) and (prevPos != None):
+                #print "found suspicious prevPos"
                 #INLINE CONDITIONAL CASE
                 if prevPos == "+0" or prevPos == prevPrevPos:
                     if 'IF' in globalStack:
@@ -212,7 +220,7 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
                         if ',l' in last:
                             newStr += ',l'
                         if ',c' in last:
-                            newStr += ',l'
+                            newStr += ',c'
                         newStr += "," + fname + ",3cn"
                         outputStack.append(newStr)
                         return ""
@@ -280,6 +288,14 @@ def getPos( localStack ):
     else:
         return None
 
+def hasTag( stack, tag):
+    #print "looking for: " + tag
+    #print "inside: " + str(stack)
+    if tag in stack and stack[stack.index(tag)+1] == '{':
+        #print "returning true"
+        return True
+    else:
+        return False
 #######################################################################################################################
 #  MAIN METHOD
 # This is the getfname main method. It will parse a screen template, and using a few stack data structures
@@ -349,6 +365,7 @@ for line in fileinput.input():
                         or popped == 'GROUP'
                         or popped == 'CHOICE'
                         or popped == 'MENUOPT'
+                        or popped == 'TM'
                     ):
                     local = False
                     compiledField = doCases(localStack, globalStack, screenOutput, prevPos, prevPrevPos)
@@ -366,6 +383,7 @@ for line in fileinput.input():
                     or lineList[word] == 'LITERAL' 
                     or lineList[word] == 'CHOICE'
                     or lineList[word] == 'MENUOPT'
+                    or lineList[word] == 'TM'
                 ):
                 local = True
                 if groupOnStack:
@@ -380,11 +398,11 @@ for line in fileinput.input():
             elif lineList[word] == 'GROUP':
                 local = True
                 groupOnStack = True
-                print "found group on line: "
-                print line
-                print "pre concat: " + str(screenOutput)
+                #print "found group on line: "
+                #print line
+                #print "pre concat: " + str(screenOutput)
                 screenOutput += ["###NEWGROUP"]
-                print "post concat: " + str(screenOutput)
+                #print "post concat: " + str(screenOutput)
                 globalStack.append(lineList[word])
                 localStack.append(lineList[word])
             else:
