@@ -8,22 +8,28 @@
 #
 #gentbl.py: Parses a command file of a specific syntax to generate corresponding html and jsrender code to create an html page
 #       inputs: An ascii encoded file, with one FNAME and parameter per line, corresponding to one element, in the format as follows:
-#               FNAME,LINEPARAMETERS or FNAME,LINEDIRECTIVE
+#               FNAME,LINEPARAMETERS or ###LINEDIRECTIVE
+#               anything following two slashes (//) is ignored (comments)
 #           
 #               where line params can be as follows:
-#                   c  = conditional
-#                   h  = heading
-#                   l  = link
-#                   3c = 3 col format. second parm is the fname of date used in col 3
-#                   cl = conditional link, sometimes link, sometimes not
-#                   ic = inline conditional, first parm is left text, second two are conditional for right field
+#                   c   = conditional
+#                   h   = heading
+#                   l   = link
+#                   m   = menuopt
+#                   3cw = 3 col format. second parm is the fname of date used in col 3
+#                   3cn = 3 col format. second parm is the fname of date used in col 3
+#                   cl  = conditional link, sometimes link, sometimes not
+#                   ic  = inline conditional, first parm is left text, second two are conditional for right field
 #                   NO PARAMS = normal element in a table/group 
 ##seperate multiple parameters with commas
 #
 #              where line directives can be as follows:
 #                    ###NEWGROUP = creates a new group, no parms needed
-#                    ###EMPTHEAD = creates new empty header, no parms needed
+#                                  groups default to having empty headings
+#                                  if a heading is found below, a heading is created
+#                                  if a fixedpro is found above, the heading is removed
 #                    ###FIXEDPRO = creates new fixed pro field, fname after comma indicates where data comes from
+#                    ###INSERT|   = Inserts arbitrary text placed after the |
 #       outputs: 
 #               html.txt: an html file that creates a web page corresponding to a screen def.
 #       returns: none.
@@ -37,6 +43,8 @@
 # inputs:
 #           FNAME - the fname corresponding to the data that we 
 #                   wanted to display
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # outputs:
 #           none
 # returns:
@@ -58,6 +66,8 @@ def link( fname, cols ):
 # inputs:
 #           FNAME - the fname corresponding to the data that we 
 #                   wanted to display
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # outputs:
 #           none
 # returns:
@@ -95,7 +105,10 @@ def heading ( fname ):
 #           title in front of it         
 #
 # inputs:
-#           parms - list of parameters for the group 
+#           PARMS - a list containing the fname to be used, and parameters
+#                   the 0th element is expected to be the fname
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # 
 # outputs:
 #           none
@@ -125,7 +138,10 @@ def threeColWithTitle ( parms, cols ):
 #           where the third column is only one of multiple fnames         
 #
 # inputs:
-#           parms - list of parameters for the group 
+#           PARMS - a list containing the fname to be used, and parameters
+#                   the 0th element is expected to be the fname
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # 
 # outputs:
 #           none
@@ -162,6 +178,8 @@ def threeColNoTitle( parms,cols ):
 # inputs:
 #           FNAME - the fnames corresponding to the data that we 
 #                   wanted to display
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # outputs:
 #           none
 # returns:
@@ -180,8 +198,10 @@ def condLink ( fname, cols ):
 #           This function creates html for a row in a group that has
 #                   mupltiple collumns in the data section
 # inputs:
-#           FNAME - the fnames corresponding to the data that we 
-#                   wanted to display
+#           DATA1 - the first fname we want to be displayed
+#           DATA2 - the second fname we want to be displayed
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # outputs:
 #           none
 # returns:
@@ -201,6 +221,8 @@ def inCond ( data1, data2, cols ):
 #                   data in the second collumn of the table
 # inputs:
 #           FNAME: - the fname corresponding to the data to be displayed
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # outputs:
 #           none
 # returns:
@@ -215,7 +237,9 @@ def genCase ( fname, cols ):
 # process(fname)
 #           handles processing of an output line
 # inputs: 
-#           line - a string, corresponding to some data to be written out
+#           LINE - a string, corresponding to some data to be written out
+#           COLS  - the number of columns that each row in the current group must have
+#                   to make everything line up
 # outputs:
 #           none
 # returns:
@@ -241,6 +265,20 @@ def process( line,cols ):
     outList.append("*\n")
     return outList
 
+###################################################################
+# rightCol(fname)
+#           generates the right column(s) of a table row
+# inputs: 
+#           parms - a list containing the fname to be used, and parameters
+#                   the 0th element is expected to be the fname
+#
+#           cols  - the number of columns that each row in the current group must have
+#                    to make everything line up
+# outputs:
+#           none
+# returns:
+#           a statement wrapped in DC C statements with appropriate formatting  
+#           to actually be written out to file
 def rightCol( parms,cols ):
     outList = []
     fname = parms[0]
@@ -268,20 +306,64 @@ def rightCol( parms,cols ):
             cols -= 1
     return outList
 
+
+###################################################################
+# rightCol(fname)
+#           generates the leftmost column of a table row
+# inputs: 
+#           fname - the fname to be used when generating this cell
+# outputs:
+#           none
+# returns:
+#           a statement wrapped in DC C statements with appropriate formatting  
+#           to actually be written out to file
 def leftCol( fname ):
     return [" DC C'<span class=\"group-desc\">{{:" + fname + "_FDESC}}</span>'\n"]
 
+###################################################################
+# rightCol(fname)
+#           generates an empty cell, used for formatting
+# inputs: 
+#           cols  - the number of columns that each row in the current group must have
+#                    to make everything line up
+# outputs:
+#           none
+# returns:
+#           a statement wrapped in DC C statements with appropriate formatting  
+#           to actually be written out to file
 def dummyCol( cols ):
     return [" DC C'<span class=\"" + getClass(cols) + "\"></span>'\n"]
 
+###################################################################
+# rightCol(fname)
+#           returns the class that should be used for the current cell
+# inputs: 
+#           parms - a list containing the fname to be used, and parameters
+#                   the 0th element is expected to be the fname
+#
+#           cols  - the number of columns that each row in the current group must have
+#                    to make everything line up
+# outputs:
+#           none
+# returns:
+#           a statement wrapped in DC C statements with appropriate formatting  
+#           to actually be written out to file
 def getClass( cols ):
-    if cols > 1:
-        return "group-inner-data"
-    if cols < 0:
+    if cols > 1 or cols < 0:
         return "group-inner-data"
     else:
         return "group-data"
 
+
+###################################################################
+# rightCol()
+#           returns a list of lines that go at the end of the screen template
+# inputs: 
+#
+# outputs:
+#           none
+# returns:
+#           a list of lines that go at the end of the screen tempplate
 def fileEnd():
     outList = []
     outList.append("**********\n")
@@ -291,14 +373,22 @@ def fileEnd():
     outList.append("         FDB$HTTO EOM\n")
     return outList
 
+###################################################################
+# rightCol()
+#           returns a list of lines that go at the beginning of the screen template
+# inputs: 
+#           screenName - the name of the current working screen
+# outputs:
+#           none
+# returns:
+#           a list of lines that go at the beginning of the screen tempplate
 def fileSetup( screenName ):
     outList = []
     outList.append("         FDB$HTTO PREFIX,                                              +\n")
     memString = "               MEMBER="
     memString += (screenName.upper() + ',')
     numSpaces = 48 - len(screenName)
-    for i in xrange(0,numSpaces):
-        memString += ' '
+    memString += " " * numSpaces
     outList.append(memString + '+\n')
     outList.append("               FORMAT=EBCDIC,                                          +\n")
     outList.append("               MEMTYPE=HTML\n")
@@ -308,6 +398,16 @@ def fileSetup( screenName ):
     outList.append(" DC C'<div id=\"fixedArea\">'\n")
     outList.append("**********\n")
     return outList
+
+###################################################################
+# rightCol()
+#           returns a list of lines that go at the beginning of the screen template
+# inputs: 
+#           group - the group list to be prepared
+# outputs:
+#           none
+# returns:
+#           a properly formateed group list
 def prepGroup( group ):
     fnames = []
     parmsPossible = ["3cw","3cn","l","cl","ic","h","c","m"]
@@ -321,6 +421,11 @@ def prepGroup( group ):
     maxLen = len(max(fnames,key=len))
     group.append(maxLen)
     return group
+
+
+
+
+
 
 import fileinput
 import sys
