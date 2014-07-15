@@ -289,6 +289,17 @@ def getPos( localStack ):
     else:
         return None
 
+#######################################################################################################################
+#  hasTag( stack, tag )
+# This is the get position method. Gets the position data from the local stack and then returns it.
+#
+# inputs:
+#           The stack to check
+#           The tag to look for
+# outputs:
+#           None
+# returns:
+#           Boolean, whether or not the tag is in the stack
 def hasTag( stack, tag):
     #print "looking for: " + tag
     #print "inside: " + str(stack)

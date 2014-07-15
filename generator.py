@@ -352,7 +352,7 @@ screenName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 #read in whole file, allGroups is a list of lists. each list is a group, each node is a row
 for line in fileinput.input():
     line = line.rstrip()
-    if '//' in line:
+    if '//' in line:                    #Ignore comments
         line.find('//')
         line = line[:line.find('//')]
     if line == '###NEWGROUP':
@@ -396,7 +396,7 @@ for group in allGroups:
         outList.append("*\n") 
 
     for row in group:
-        if '###INSERT' in row:
+        if '###INSERT' in row:    #insert arbitrary text found after the ###INSERT directive
             thisRow = row.split('|')[1] + "\n"
         else:
             thisRow = process(row,colsNeeded)
