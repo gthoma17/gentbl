@@ -147,8 +147,9 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
             fieldStart = localStack.index('LITERAL')
         elif 'CHOICE' in localStack:
             fieldStart = localStack.index('CHOICE')
+        elif 'PACK' in localStack:
+            fieldStart = localStack.index('PACK')
         elif 'TM' in localStack:
-            print "found TM"
             fieldStart = localStack.index('TM')
 
         #HEADER CASE
@@ -365,6 +366,7 @@ for line in fileinput.input():
                         or popped == 'GROUP'
                         or popped == 'CHOICE'
                         or popped == 'MENUOPT'
+                        or popped == 'PACK'
                         or popped == 'TM'
                     ):
                     local = False
@@ -383,6 +385,7 @@ for line in fileinput.input():
                     or lineList[word] == 'LITERAL' 
                     or lineList[word] == 'CHOICE'
                     or lineList[word] == 'MENUOPT'
+                    or lineList[word] == 'PACK'
                     or lineList[word] == 'TM'
                 ):
                 local = True

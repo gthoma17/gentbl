@@ -397,7 +397,7 @@ for group in allGroups:
 
     for row in group:
         if '###INSERT' in row:
-            thisRow = row.split('|')[1]
+            thisRow = row.split('|')[1] + "\n"
         else:
             thisRow = process(row,colsNeeded)
         outList += thisRow
