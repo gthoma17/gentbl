@@ -255,11 +255,11 @@ def doCases( localStack, globalStack, outputStack, prevPos, prevPrevPos ):
     elif 'MENUOPT' in localStack:
         fieldStart = localStack.index('MENUOPT')
         
-        if localStack[fieldStart+2] != 'SEL':
+        if not 'SEL' in localStack:
             return ""
         else:
             new_string = 'MOPT'
-            selector = localStack[fieldStart+4]
+            selector = localStack[localStack.index('SEL')+2]
             if int(selector) < 10:
                 new_string += '0'
             new_string += selector

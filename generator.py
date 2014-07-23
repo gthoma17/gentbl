@@ -80,10 +80,17 @@ def menuopt( fname ):
     outList.append(" DC C'<div class=\"fixedLine\">'\n")
     outList.append(" DC C'<div class=\"fixFloat\">'\n")
     outList.append(" DC C'<span class=\"spacer\">                  </span></div>'\n")
-    outList.append(" DC C'<div class=\"menuopt-area\">'\n")
-    outList.append(" DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n")
-    outList.append(" DC C'{{:" + fname + "_DATA}}</a></div></div>'\n")
+    outlist.append(" DC C'<div class=\"menuopt-area\">'\n")
+    outlist.append(" DC C'{{if " + fname + "_ALINK}}'\n")
+    outlist.append(" DC C'<a id=\"{{:" + fname + "_ID}}\" class=\"menuopt-opt\">'\n")
+    outlist.append(" DC C'{{:" + fname + "_DATA}}</a>'\n")
+    outlist.append(" DC C'{{else}}'\n")
+    outlist.append(" DC C'<span class=\"menuopt-opt-Disabled\" id=\"{{:" + fname + "_ID}}\">'\n")
+    outlist.append(" DC C'{{:" + fname + "_DATA}}</span>'\n")
+    outlist.append(" DC C'{{/if}}'\n")
+    outlist.append(" DC C'</div>'\n")
     return outList
+
 
 ###################################################################
 # heading(fname):
